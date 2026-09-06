@@ -138,7 +138,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let selectedThemeValue = 'default';
 
-  // --- 0. CONFIGURACIÓN VISUAL E ICONOS ---
+  // --- 0. CONFIGURACIÓN VISUAL E ICONOS Y REPOSITORIO ---
+
+  async function loadRepoConfig() {
+    try {
+      const response = await fetch('./config.json', { cache: 'no-cache' });
+      if (response.ok) {
+        const repoData = await response.json();
+        
+        // Si no existen configuraciones locales guardadas, aplicar las de config.json en el repo
+        if (!localStorage.getItem('portal_visual_settings') && repoData.visualSettings) {
+          localStorage.setItem('portal_visual_settings', JSON.stringify(repoData.visualSettings));
+        }
+
+        if (!localStorage.getItem('portal_materials_list') && repoData.materials) {
+          localStorage.setItem('portal_materials_list', JSON.stringify(repoData.materials));
+        }
+
+        applyVisualSettings();
+        if (currentUser) {
+          renderMaterials();
+        }
+      }
+    } catch (e) {
+      console.log('Falla al cargar config.json o ejecutando localmente:', e);
+    }
+  }
 
   function getVisualSettings() {
     const saved = localStorage.getItem('portal_visual_settings');
@@ -206,15 +231,15 @@ document.addEventListener('DOMContentLoaded', () => {
       appAuthLogo.innerHTML = `<i class="fas ${logoIconClass}"></i>`;
     }
 
-
     // Actualizar dinámicamente el favicon de la pestaña para coincidir exactamente con el icono de la web
     updateDynamicFavicon(logoIconClass, selectedThemeValue);
   }
 
   // --- 1. GESTIÓN DE SESIÓN Y LOGIN ---
 
-  function checkSession() {
+  async function checkSession() {
     applyVisualSettings();
+    await loadRepoConfig();
     if (currentUser && ALLOWED_EMAILS.includes(currentUser.toLowerCase())) {
       showDashboard();
     } else {
@@ -608,7 +633,164 @@ document.addEventListener('DOMContentLoaded', () => {
       applyVisualSettings();
       closeTheme();
     });
+
+    // --- Respaldo y Exportación / Importación ---
+    const btnExportConfig = document.getElementById('btnExportConfig');
+    const btnImportConfig = document.getElementById('btnImportConfig');
+    const importFileInput = document.getElementById('importFileInput');
+
+    if (btnExportConfig) {
+      btnExportConfig.addEventListener('click', () => {
+        const repoConfigData = {
+          visualSettings: getVisualSettings(),
+          materials: getMaterials()
+        };
+
+        const jsonStr = JSON.stringify(repoConfigData, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `config.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    if (btnImportConfig && importFileInput) {
+      btnImportConfig.addEventListener('click', () => {
+        importFileInput.click();
+      });
+
+      importFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const data = JSON.parse(event.target.result);
+            if (data.visualSettings) {
+              localStorage.setItem('portal_visual_settings', JSON.stringify(data.visualSettings));
+            }
+            if (data.materials && Array.isArray(data.materials)) {
+              localStorage.setItem('portal_materials_list', JSON.stringify(data.materials));
+            }
+
+            applyVisualSettings();
+            renderMaterials();
+            alert('¡Configuración y materiales cargados con éxito en este navegador!');
+            closeTheme();
+          } catch (err) {
+            alert('Error al leer el archivo de respaldo. Asegúrate de seleccionar un archivo JSON válido.');
+            console.error('Error importando configuración:', err);
+          }
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    // --- Publicación Directa a GitHub vía API REST ---
+    const btnPublishToGitHub = document.getElementById('btnPublishToGitHub');
+    const ghOwnerInput = document.getElementById('ghOwnerInput');
+    const ghRepoInput = document.getElementById('ghRepoInput');
+    const ghTokenInput = document.getElementById('ghTokenInput');
+    const ghSyncStatus = document.getElementById('ghSyncStatus');
+
+    // Cargar credenciales guardadas de GitHub si existen
+    const savedGhConfig = JSON.parse(localStorage.getItem('portal_github_credentials') || '{}');
+    if (savedGhConfig.owner && ghOwnerInput) ghOwnerInput.value = savedGhConfig.owner;
+    if (savedGhConfig.repo && ghRepoInput) ghRepoInput.value = savedGhConfig.repo;
+    if (savedGhConfig.token && ghTokenInput) ghTokenInput.value = savedGhConfig.token;
+
+    if (btnPublishToGitHub) {
+      btnPublishToGitHub.addEventListener('click', async () => {
+        const owner = ghOwnerInput.value.trim();
+        const repo = ghRepoInput.value.trim();
+        const token = ghTokenInput.value.trim();
+
+        if (!owner || !repo || !token) {
+          alert('Por favor completa el usuario de GitHub, el nombre del repositorio y el Token de acceso personal (PAT).');
+          return;
+        }
+
+        // Guardar credenciales para futuras publicaciones rápidas
+        localStorage.setItem('portal_github_credentials', JSON.stringify({ owner, repo, token }));
+
+        ghSyncStatus.style.color = '#38bdf8';
+        ghSyncStatus.textContent = 'Verificando repositorio en GitHub...';
+
+        try {
+          const configPath = 'config.json';
+          const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${configPath}`;
+
+          // 1. Obtener el SHA actual de config.json en GitHub (necesario para actualizar)
+          let currentSha = null;
+          const getRes = await fetch(apiUrl, {
+            headers: {
+              'Authorization': `token ${token}`,
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          });
+
+          if (getRes.ok) {
+            const fileData = await getRes.json();
+            currentSha = fileData.sha;
+          }
+
+          // 2. Preparar el nuevo contenido JSON
+          const newConfigData = {
+            visualSettings: getVisualSettings(),
+            materials: getMaterials(),
+            updatedAt: new Date().toISOString()
+          };
+
+          const jsonContent = JSON.stringify(newConfigData, null, 2);
+          const base64Content = btoa(unescape(encodeURIComponent(jsonContent)));
+
+          // 3. Enviar PUT a la API REST de GitHub para hacer commit automático
+          ghSyncStatus.textContent = 'Guardando commit en GitHub...';
+          const putPayload = {
+            message: 'Actualizar config.json directamente desde el portal web',
+            content: base64Content,
+            branch: 'main'
+          };
+          if (currentSha) {
+            putPayload.sha = currentSha;
+          }
+
+          const putRes = await fetch(apiUrl, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `token ${token}`,
+              'Accept': 'application/vnd.github.v3+json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(putPayload)
+          });
+
+          if (putRes.ok) {
+            ghSyncStatus.style.color = '#10b981';
+            ghSyncStatus.textContent = '¡Publicado con éxito en GitHub! 🎉';
+            alert('¡Excelente! Los cambios se guardaron directamente en tu repositorio de GitHub sin abrir la terminal. En ~30 segundos se actualizará en todos los dispositivos.');
+          } else {
+            const errData = await putRes.json();
+            ghSyncStatus.style.color = '#ef4444';
+            ghSyncStatus.textContent = 'Error al publicar en GitHub.';
+            alert('Error devuelto por GitHub: ' + (errData.message || 'Verifica que tu Token tenga permisos de contents: write.'));
+          }
+        } catch (err) {
+          ghSyncStatus.style.color = '#ef4444';
+          ghSyncStatus.textContent = 'Error de conexión.';
+          alert('Error de conexión con la API de GitHub: ' + err.message);
+        }
+      });
+    }
   }
+
 
   // Utilidad Escape HTML
   function escapeHtml(str) {

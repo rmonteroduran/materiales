@@ -1,0 +1,52 @@
+{
+  "visualSettings": {
+    "theme": "default",
+    "title": "Materiales Pro",
+    "logoIcon": "fa-cubes"
+  },
+  "materials": [
+    {
+      "id": "workhq-ssnc",
+      "title": "SS&C WorkHQ",
+      "category": "workshops",
+      "description": "Herramienta interactiva y centro de apoyo operativo de SS&C WorkHQ con guías y simulaciones visuales.",
+      "url": "./Workshops/WorkHQ/index.html",
+      "tags": [
+        "WorkHQ",
+        "SS&C",
+        "Workshop",
+        "Capacitación"
+      ],
+      "bannerBg": "linear-gradient(135deg, #0284c7, #6366f1)",
+      "icon": "fa-laptop-code"
+    },
+    {
+      "id": "presentacion-ejecutiva-2026",
+      "title": "Presentación Estratégica 2026",
+      "category": "presentaciones",
+      "description": "Plantilla y estructura máster para presentaciones de negocios, propuestas técnicas y workshops.",
+      "url": "#",
+      "tags": [
+        "Diapositivas",
+        "Estrategia",
+        "Executive"
+      ],
+      "bannerBg": "linear-gradient(135deg, #d97706, #e11d48)",
+      "icon": "fa-file-powerpoint"
+    },
+    {
+      "id": "portal-unificado-materiales",
+      "title": "Portal Unificado de Materiales",
+      "category": "proyectos",
+      "description": "Hub centralizado con acceso seguro a todas las plataformas, workshops y proyectos profesionales.",
+      "url": "./index.html",
+      "tags": [
+        "Portal Web",
+        "Dashboard",
+        "CSS3/JS"
+      ],
+      "bannerBg": "linear-gradient(135deg, #059669, #2563eb)",
+      "icon": "fa-layer-group"
+    }
+  ]
+}

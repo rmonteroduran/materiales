@@ -814,6 +814,34 @@ button, input, select, textarea {
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.modal-content.modal-wide {
+  max-width: 900px;
+  width: 95%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-wide .modal-body {
+  overflow-y: auto;
+  max-height: calc(85vh - 120px);
+  padding-right: 8px;
+}
+
+.theme-modal-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .theme-modal-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 .modal-header {
   display: flex;
   align-items: center;
