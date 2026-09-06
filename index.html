@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Materiales de Apoyo | Rodrigo Montero Durán</title>
+
+  <!-- Favicon para la pestaña del navegador -->
+  <link rel="icon" id="appFavicon" type="image/svg+xml" href="favicon.svg">
+
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- ==========================================================================
+       PANTALLA DE AUTENTICACIÓN (LOGIN)
+       ========================================================================== -->
+  <div id="authScreen" class="auth-container">
+    <div class="auth-card glass-panel">
+      <div class="auth-header">
+        <div id="appAuthLogo" class="auth-icon">
+          <i class="fas fa-lock"></i>
+        </div>
+        <h1>Portal de <span class="gradient-text">Materiales</span></h1>
+        <p>Ingresa tu correo autorizado para acceder a Workshops, Presentaciones y Proyectos.</p>
+      </div>
+
+      <div id="authAlert" class="auth-alert error hidden">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>Mensaje de error</span>
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="emailInput">Correo Electrónico</label>
+          <div class="input-wrapper">
+            <i class="fas fa-envelope input-icon"></i>
+            <input type="email" id="emailInput" class="form-input" placeholder="ejemplo@gmail.com" required
+              autocomplete="email">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="passwordInput">Contraseña</label>
+          <div class="input-wrapper">
+            <i class="fas fa-key input-icon"></i>
+            <input type="password" id="passwordInput" class="form-input" placeholder="••••••••••••" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <p>© 2026 Rodrigo Montero Durán · Acceso Reservado</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       DASHBOARD / LANDING PAGE PRINCIPAL (DESPUÉS DEL LOGIN)
+       ========================================================================== -->
+  <div id="appDashboard" class="app-container hidden">
+
+    <!-- Header / Navbar -->
+    <header class="navbar glass-panel">
+      <div class="nav-brand">
+        <div id="appHeaderLogo" class="nav-logo">
+          <i class="fas fa-cubes"></i>
+        </div>
+        <span id="appHeaderTitle">Materiales <span class="gradient-text">Pro</span></span>
+      </div>
+
+      <div class="nav-actions">
+        <div class="user-badge">
+          <div id="userAvatar" class="user-avatar">R</div>
+          <span id="userEmailDisplay">usuario@gmail.com</span>
+        </div>
+
+        <button id="btnOpenThemeModal" class="btn-icon" title="Ajustes Visuales e Iconos">
+          <i class="fas fa-palette"></i> <span>Diseño</span>
+        </button>
+
+        <button id="btnOpenPasswordModal" class="btn-icon" title="Cambiar Contraseña">
+          <i class="fas fa-key"></i> <span>Contraseña</span>
+        </button>
+
+        <button id="btnLogout" class="btn-icon btn-outline-danger" title="Cerrar Sesión">
+          <i class="fas fa-sign-out-alt"></i> <span>Salir</span>
+        </button>
+      </div>
+    </header>
+
+
+    <!-- Main Content Body -->
+    <main class="main-content">
+
+      <!-- Hero Banner & Search -->
+      <section class="hero-banner glass-panel">
+        <div class="hero-text">
+          <h1>Bienvenido a tu <span class="gradient-text">Centro de Materiales</span></h1>
+          <p>Explora y accede a tus workshops, presentaciones interactivas y proyectos profesionales
+            centralizados en una sola plataforma.</p>
+        </div>
+
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchInput" placeholder="Buscar por título, palabra clave o etiqueta...">
+        </div>
+      </section>
+
+      <!-- Filter Tabs & Actions -->
+      <section class="tabs-section">
+        <div class="tabs-header">
+          <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="all">
+              <i class="fas fa-th-large"></i> Todos <span class="tab-badge" id="count-all">0</span>
+            </button>
+            <button class="tab-btn" data-tab="workshops">
+              <i class="fas fa-laptop-code"></i> Workshops <span class="tab-badge" id="count-workshops">0</span>
+            </button>
+            <button class="tab-btn" data-tab="presentaciones">
+              <i class="fas fa-file-powerpoint"></i> Presentaciones <span class="tab-badge"
+                id="count-presentaciones">0</span>
+            </button>
+            <button class="tab-btn" data-tab="proyectos">
+              <i class="fas fa-project-diagram"></i> Proyectos <span class="tab-badge" id="count-proyectos">0</span>
+            </button>
+          </div>
+
+          <button id="btnOpenAddModal" class="btn-primary" style="width: auto; padding: 10px 18px;">
+            <i class="fas fa-plus-circle"></i> Nuevo Material
+          </button>
+        </div>
+
+        <!-- Materials Grid -->
+        <div id="cardsGrid" class="cards-grid">
+          <!-- Dynamic Material Cards rendered via JS -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state glass-panel hidden">
+          <div class="empty-icon">
+            <i class="fas fa-folder-open"></i>
+          </div>
+          <h3>No se encontraron materiales</h3>
+          <p>Intenta ajustar la búsqueda o seleccionar otra categoría en el menú superior.</p>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>© 2026 Rodrigo Montero Durán · Materiales de Apoyo Profesional</p>
+    </footer>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: CAMBIAR CONTRASEÑA
+       ========================================================================== -->
+  <div id="passwordModal" class="modal-overlay hidden">
+    <div class="modal-content glass-panel">
+      <div class="modal-header">
+        <h3><i class="fas fa-shield-alt gradient-text"></i> Cambiar Contraseña</h3>
+        <button id="closePasswordModal" class="btn-close-modal"><i class="fas fa-times"></i></button>
+      </div>
+
+      <div id="passAlert" class="auth-alert error hidden">
+        <i class="fas fa-exclamation-triangle"></i> <span>Alerta</span>
+      </div>
+
+      <form id="passwordForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="currentPassInput">Contraseña Actual</label>
+            <input type="password" id="currentPassInput" class="form-input" required style="padding-left: 14px;">
+          </div>
+
+          <div class="form-group">
+            <label for="newPassInput">Nueva Contraseña</label>
+            <input type="password" id="newPassInput" class="form-input" placeholder="Mínimo 6 caracteres" required
+              style="padding-left: 14px;">
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassInput">Confirmar Nueva Contraseña</label>
+            <input type="password" id="confirmPassInput" class="form-input" required style="padding-left: 14px;">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="cancelPasswordModal" class="btn-secondary">Cancelar</button>
+          <button type="submit" class="btn-primary" style="width: auto;">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: AÑADIR MATERIAL DINÁMICO
+       ========================================================================== -->
+  <div id="addMaterialModal" class="modal-overlay hidden">
+    <div class="modal-content glass-panel">
+      <div class="modal-header">
+        <h3><i class="fas fa-plus-circle gradient-text"></i> Registrar Nuevo Material</h3>
+        <button id="closeAddModal" class="btn-close-modal"><i class="fas fa-times"></i></button>
+      </div>
+
+      <form id="addMaterialForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="matTitleInput">Título del Material</label>
+            <input type="text" id="matTitleInput" class="form-input" placeholder="Ej: Workshop de Innovación" required
+              style="padding-left: 14px;">
+          </div>
+
+          <div class="form-group">
+            <label for="matCategorySelect">Categoría</label>
+            <select id="matCategorySelect" class="form-input" style="padding-left: 14px;">
+              <option value="workshops">Workshops</option>
+              <option value="presentaciones">Presentaciones</option>
+              <option value="proyectos">Proyectos</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="matIconSelect">Icono Representativo</label>
+            <select id="matIconSelect" class="form-input" style="padding-left: 14px;">
+              <option value="fa-laptop-code">💻 Laptop / Código</option>
+              <option value="fa-file-powerpoint">📊 Presentación / Diapositivas</option>
+              <option value="fa-project-diagram">🌿 Proyecto / Diagrama</option>
+              <option value="fa-chart-line">📈 Gráfico / Estrategia</option>
+              <option value="fa-graduation-cap">🎓 Capacitación / Taller</option>
+              <option value="fa-briefcase">💼 Negocios / Portafolio</option>
+              <option value="fa-rocket">🚀 Lanzamiento / Innovación</option>
+              <option value="fa-cubes">🧊 Módulos / Sistema</option>
+              <option value="fa-terminal">🖥️ Consola / Dev</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="matUrlInput">Enlace / Ruta Web</label>
+            <input type="text" id="matUrlInput" class="form-input"
+              placeholder="Ej: ./Workshops/MiNuevoWorkshop/index.html" required style="padding-left: 14px;">
+          </div>
+
+          <div class="form-group">
+            <label for="matDescInput">Descripción Breve</label>
+            <textarea id="matDescInput" class="form-input" rows="3" placeholder="Resumen del contenido del material..."
+              required style="padding-left: 14px; resize: vertical;"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="matTagsInput">Etiquetas (separadas por coma)</label>
+            <input type="text" id="matTagsInput" class="form-input" placeholder="Ej: SS&C, Capacitación, 2026"
+              style="padding-left: 14px;">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="cancelAddModal" class="btn-secondary">Cancelar</button>
+          <button type="submit" class="btn-primary" style="width: auto;">Agregar Material</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: EDITAR MATERIAL
+       ========================================================================== -->
+  <div id="editMaterialModal" class="modal-overlay hidden">
+    <div class="modal-content glass-panel">
+      <div class="modal-header">
+        <h3><i class="fas fa-edit gradient-text"></i> Editar Material</h3>
+        <button id="closeEditModal" class="btn-close-modal"><i class="fas fa-times"></i></button>
+      </div>
+
+      <form id="editMaterialForm">
+        <input type="hidden" id="editMatIdInput">
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="editMatTitleInput">Título del Material</label>
+            <input type="text" id="editMatTitleInput" class="form-input" required style="padding-left: 14px;">
+          </div>
+
+          <div class="form-group">
+            <label for="editMatCategorySelect">Categoría</label>
+            <select id="editMatCategorySelect" class="form-input" style="padding-left: 14px;">
+              <option value="workshops">Workshops</option>
+              <option value="presentaciones">Presentaciones</option>
+              <option value="proyectos">Proyectos</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="editMatIconSelect">Icono Representativo</label>
+            <select id="editMatIconSelect" class="form-input" style="padding-left: 14px;">
+              <option value="fa-laptop-code">💻 Laptop / Código</option>
+              <option value="fa-file-powerpoint">📊 Presentación / Diapositivas</option>
+              <option value="fa-project-diagram">🌿 Proyecto / Diagrama</option>
+              <option value="fa-chart-line">📈 Gráfico / Estrategia</option>
+              <option value="fa-graduation-cap">🎓 Capacitación / Taller</option>
+              <option value="fa-briefcase">💼 Negocios / Portafolio</option>
+              <option value="fa-rocket">🚀 Lanzamiento / Innovación</option>
+              <option value="fa-cubes">🧊 Módulos / Sistema</option>
+              <option value="fa-terminal">🖥️ Consola / Dev</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="editMatUrlInput">Enlace / Ruta Web</label>
+            <input type="text" id="editMatUrlInput" class="form-input" required style="padding-left: 14px;">
+          </div>
+
+          <div class="form-group">
+            <label for="editMatDescInput">Descripción Breve</label>
+            <textarea id="editMatDescInput" class="form-input" rows="3" required
+              style="padding-left: 14px; resize: vertical;"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="editMatTagsInput">Etiquetas (separadas por coma)</label>
+            <input type="text" id="editMatTagsInput" class="form-input" style="padding-left: 14px;">
+          </div>
+        </div>
+
+        <div class="modal-footer" style="justify-content: space-between;">
+          <button type="button" id="btnDeleteMaterial" class="btn-danger">
+            <i class="fas fa-trash-alt"></i> Eliminar
+          </button>
+          <div style="display: flex; gap: 10px;">
+            <button type="button" id="cancelEditModal" class="btn-secondary">Cancelar</button>
+            <button type="submit" class="btn-primary" style="width: auto;">Guardar Cambios</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: AJUSTES VISUALES Y DISEÑO DE LA APP
+       ========================================================================== -->
+  <div id="themeModal" class="modal-overlay hidden">
+    <div class="modal-content glass-panel">
+      <div class="modal-header">
+        <h3><i class="fas fa-palette gradient-text"></i> Personalización & Diseño</h3>
+        <button id="closeThemeModal" class="btn-close-modal"><i class="fas fa-times"></i></button>
+      </div>
+
+      <form id="themeForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="themeTitleInput">Título Principal de la App</label>
+            <input type="text" id="themeTitleInput" class="form-input" placeholder="Ej: Materiales Pro" required
+              style="padding-left: 14px;">
+          </div>
+
+          <div class="form-group">
+            <label for="themeLogoIconSelect">Icono Principal del Portal & Favicon</label>
+            <select id="themeLogoIconSelect" class="form-input" style="padding-left: 14px;">
+              <option value="fa-cubes">🧊 Cubos Módulos (Default)</option>
+              <option value="fa-layer-group">📚 Capas de Materiales</option>
+              <option value="fa-rocket">🚀 Cohete / Innovación</option>
+              <option value="fa-brain">🧠 Inteligencia / Estrategia</option>
+              <option value="fa-briefcase">💼 Portafolio Ejecutivo</option>
+              <option value="fa-laptop-code">💻 Desarrollo / Workshops</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Tema de Color de la Interfaz</label>
+            <div class="theme-options-grid">
+              <div class="theme-card active" data-theme-value="default">
+                <div class="theme-preview-dot" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);"></div>
+                <div>
+                  <strong style="display:block; font-size: 13px;">Neon Indigo</strong>
+                  <span style="font-size: 11px; color: var(--text-muted);">Por defecto</span>
+                </div>
+              </div>
+              <div class="theme-card" data-theme-value="emerald">
+                <div class="theme-preview-dot" style="background: linear-gradient(135deg, #10b981, #14b8a6);"></div>
+                <div>
+                  <strong style="display:block; font-size: 13px;">Emerald Teal</strong>
+                  <span style="font-size: 11px; color: var(--text-muted);">Verde Menta</span>
+                </div>
+              </div>
+              <div class="theme-card" data-theme-value="sunset">
+                <div class="theme-preview-dot" style="background: linear-gradient(135deg, #f43f5e, #f59e0b);"></div>
+                <div>
+                  <strong style="display:block; font-size: 13px;">Sunset Amber</strong>
+                  <span style="font-size: 11px; color: var(--text-muted);">Cálido Atardecer</span>
+                </div>
+              </div>
+              <div class="theme-card" data-theme-value="cyber">
+                <div class="theme-preview-dot" style="background: linear-gradient(135deg, #06b6d4, #d946ef);"></div>
+                <div>
+                  <strong style="display:block; font-size: 13px;">Cyber Neón</strong>
+                  <span style="font-size: 11px; color: var(--text-muted);">Cian & Violeta</span>
+                </div>
+              </div>
+              <div class="theme-card" data-theme-value="slate">
+                <div class="theme-preview-dot" style="background: linear-gradient(135deg, #38bdf8, #64748b);"></div>
+                <div>
+                  <strong style="display:block; font-size: 13px;">Slate Steel</strong>
+                  <span style="font-size: 11px; color: var(--text-muted);">Acero Elegante</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="cancelThemeModal" class="btn-secondary">Cancelar</button>
+          <button type="submit" class="btn-primary" style="width: auto;">Aplicar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- App Script -->
+  <script src="app.js"></script>
+</body>
+
+</html>
