@@ -694,9 +694,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Apply Logos
+    const isUrlLogo = (theme.logoType === 'url' || theme.logoType === 'image') && theme.logoUrl && theme.logoUrl.trim() !== '';
     const logoBadges = document.querySelectorAll('.logo-badge');
     logoBadges.forEach(logoBadge => {
-      if (theme.logoType === 'url' && theme.logoUrl && theme.logoUrl.trim() !== '') {
+      if (isUrlLogo) {
         logoBadge.innerHTML = `<img src="${theme.logoUrl}" alt="Logo">`;
       } else {
         logoBadge.innerHTML = `<i class="${theme.logoIcon || 'fa-solid fa-layer-group'}"></i>`;
@@ -706,7 +707,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Apply Browser Tab Favicon
     const faviconLink = document.getElementById('favicon');
     if (faviconLink) {
-      if (theme.logoType === 'url' && theme.logoUrl && theme.logoUrl.trim() !== '') {
+      if (isUrlLogo) {
         faviconLink.href = theme.logoUrl;
       } else {
         faviconLink.href = 'favicon.svg';
@@ -716,7 +717,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Form sync
     if (cfgBrandTitle) cfgBrandTitle.value = theme.brandTitle;
     if (cfgBrandSubtitle) cfgBrandSubtitle.value = theme.brandSubtitle;
-    if (cfgLogoType) cfgLogoType.value = theme.logoType || 'icon';
+    if (cfgLogoType) cfgLogoType.value = (theme.logoType === 'image' || theme.logoType === 'url') ? 'url' : 'icon';
     if (cfgLogoIcon) cfgLogoIcon.value = theme.logoIcon || 'fa-solid fa-layer-group';
     if (cfgLogoUrl) cfgLogoUrl.value = theme.logoUrl || '';
     if (cfgColorPrimary) cfgColorPrimary.value = theme.colorPrimary;
@@ -725,7 +726,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cfgColorSurface) cfgColorSurface.value = theme.colorSurface;
 
     if (groupLogoIcon && groupLogoUrl) {
-      if (theme.logoType === 'url') {
+      if (theme.logoType === 'url' || theme.logoType === 'image') {
         groupLogoIcon.style.display = 'none';
         groupLogoUrl.style.display = 'flex';
       } else {
