@@ -39,6 +39,26 @@ document.addEventListener('DOMContentLoaded', () => {
     btnStartWorkshop.addEventListener('click', () => updateSlide(1));
   }
 
+  // --- Carga Completa de Configuración desde config.json ---
+  async function loadWorkHQConfig() {
+    try {
+      const response = await fetch('./config.json', { cache: 'no-cache' });
+      if (response.ok) {
+        const configData = await response.json();
+        const savedTheme = localStorage.getItem('workhq_workshop_theme');
+        if (!savedTheme && configData) {
+          applyTheme(configData, false);
+        }
+      }
+    } catch (err) {
+      console.log('Carga predeterminada sin config.json:', err);
+    }
+  }
+
+  loadWorkHQConfig();
+
+
+
   /* ==========================================================================
      Slide Navigation Logic
      ========================================================================== */
@@ -668,6 +688,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const brandSubtitleEl = document.querySelector('.brand-subtitle');
     if (brandSubtitleEl) brandSubtitleEl.textContent = theme.brandSubtitle;
+
+    if (theme.brandTitle) {
+      document.title = `${theme.brandTitle} | Rodrigo Montero Durán`;
+    }
 
     // Apply Logos
     const logoBadges = document.querySelectorAll('.logo-badge');

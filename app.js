@@ -17,38 +17,18 @@ document.addEventListener('DOMContentLoaded', () => {
       id: 'workhq-ssnc',
       title: 'SS&C WorkHQ',
       category: 'workshops',
-      description: 'Herramienta interactiva y centro de apoyo operativo de SS&C WorkHQ con guías y simulaciones visuales.',
+      description: 'De RPA a la orquestación inteligente. Inmersión en el ecosistema de SS&C WorkHQ.',
       url: './Workshops/WorkHQ/index.html',
       tags: ['WorkHQ', 'SS&C', 'Workshop', 'Capacitación'],
       bannerBg: 'linear-gradient(135deg, #0284c7, #6366f1)',
-      icon: 'fa-laptop-code'
-    },
-    {
-      id: 'presentacion-ejecutiva-2026',
-      title: 'Presentación Estratégica 2026',
-      category: 'presentaciones',
-      description: 'Plantilla y estructura máster para presentaciones de negocios, propuestas técnicas y workshops.',
-      url: '#',
-      tags: ['Diapositivas', 'Estrategia', 'Executive'],
-      bannerBg: 'linear-gradient(135deg, #d97706, #e11d48)',
-      icon: 'fa-file-powerpoint'
-    },
-    {
-      id: 'portal-unificado-materiales',
-      title: 'Portal Unificado de Materiales',
-      category: 'proyectos',
-      description: 'Hub centralizado con acceso seguro a todas las plataformas, workshops y proyectos profesionales.',
-      url: './index.html',
-      tags: ['Portal Web', 'Dashboard', 'CSS3/JS'],
-      bannerBg: 'linear-gradient(135deg, #059669, #2563eb)',
-      icon: 'fa-layer-group'
+      icon: 'fa-graduation-cap'
     }
   ];
 
   const DEFAULT_VISUAL_SETTINGS = {
-    theme: 'default',
-    title: 'Materiales Pro',
-    logoIcon: 'fa-cubes'
+    theme: 'emerald',
+    title: 'Rodrigo Montero Durán',
+    logoIcon: 'fa-briefcase'
   };
 
   const THEME_GRADIENTS = {
@@ -136,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeLogoIconSelect = document.getElementById('themeLogoIconSelect');
   const themeCards = document.querySelectorAll('.theme-card');
 
-  let selectedThemeValue = 'default';
+  let selectedThemeValue = 'emerald';
 
   // --- 0. CONFIGURACIÓN VISUAL E ICONOS Y REPOSITORIO ---
 
@@ -145,14 +125,27 @@ document.addEventListener('DOMContentLoaded', () => {
       const response = await fetch('./config.json', { cache: 'no-cache' });
       if (response.ok) {
         const repoData = await response.json();
-        
-        // Si no existen configuraciones locales guardadas, aplicar las de config.json en el repo
-        if (!localStorage.getItem('portal_visual_settings') && repoData.visualSettings) {
-          localStorage.setItem('portal_visual_settings', JSON.stringify(repoData.visualSettings));
-        }
+        const localVisual = localStorage.getItem('portal_visual_settings');
+        const localTime = localStorage.getItem('portal_config_updated_at');
 
-        if (!localStorage.getItem('portal_materials_list') && repoData.materials) {
-          localStorage.setItem('portal_materials_list', JSON.stringify(repoData.materials));
+        // Si la PC/Navegador es nuevo O si config.json en GitHub es más reciente que la sesión local
+        const repoTime = repoData.exportedAt || repoData.updatedAt;
+        const isRepoNewer = repoTime && (!localTime || new Date(repoTime) > new Date(localTime));
+
+        if (!localVisual || isRepoNewer) {
+          if (repoData.visualSettings) {
+            localStorage.setItem('portal_visual_settings', JSON.stringify(repoData.visualSettings));
+          }
+          if (repoData.materials) {
+            localStorage.setItem('portal_materials_list', JSON.stringify(repoData.materials));
+          }
+          if (repoData.password) {
+            localStorage.setItem('portal_password', repoData.password);
+            currentPassword = repoData.password;
+          }
+          if (repoTime) {
+            localStorage.setItem('portal_config_updated_at', repoTime);
+          }
         }
 
         applyVisualSettings();
@@ -181,8 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const appFavicon = document.getElementById('appFavicon');
     if (!appFavicon) return;
 
-    const colors = THEME_GRADIENTS[themeName] || THEME_GRADIENTS.default;
-    const shapeSvg = LOGO_SVG_SHAPES[logoIconClass] || LOGO_SVG_SHAPES['fa-cubes'];
+    const colors = THEME_GRADIENTS[themeName] || THEME_GRADIENTS.emerald;
+    const shapeSvg = LOGO_SVG_SHAPES[logoIconClass] || LOGO_SVG_SHAPES['fa-briefcase'];
 
     const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
       <defs>
@@ -200,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function applyVisualSettings() {
     const settings = getVisualSettings();
-    selectedThemeValue = settings.theme || 'default';
+    selectedThemeValue = settings.theme || 'emerald';
 
     // Aplicar tema en data-theme
     if (selectedThemeValue === 'default') {
@@ -211,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Aplicar título dinámico con degradado en la última palabra
     if (appHeaderTitle) {
-      const fullTitle = settings.title || 'Materiales Pro';
+      const fullTitle = settings.title || 'Rodrigo Montero Durán';
       const parts = fullTitle.trim().split(' ');
       if (parts.length > 1) {
         const lastWord = parts.pop();
@@ -223,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.title = `${settings.title || 'Portal de Materiales'} | Rodrigo Montero Durán`;
 
     // Aplicar icono del logo en header y login
-    const logoIconClass = settings.logoIcon || 'fa-cubes';
+    const logoIconClass = settings.logoIcon || 'fa-briefcase';
     if (appHeaderLogo) {
       appHeaderLogo.innerHTML = `<i class="fas ${logoIconClass}"></i>`;
     }
@@ -316,6 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function saveMaterials(list) {
     localStorage.setItem('portal_materials_list', JSON.stringify(list));
+    localStorage.setItem('portal_config_updated_at', new Date().toISOString());
   }
 
   function getBannerForCategory(category) {
@@ -464,6 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     currentPassword = next;
     localStorage.setItem('portal_password', currentPassword);
+    localStorage.setItem('portal_config_updated_at', new Date().toISOString());
     alert('¡Contraseña actualizada exitosamente!');
     closePassModal();
   });
@@ -590,9 +585,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnOpenThemeModal) {
     btnOpenThemeModal.addEventListener('click', () => {
       const settings = getVisualSettings();
-      themeTitleInput.value = settings.title || 'Materiales Pro';
+      themeTitleInput.value = settings.title || 'Rodrigo Montero Durán';
       if (themeLogoIconSelect) {
-        themeLogoIconSelect.value = settings.logoIcon || 'fa-cubes';
+        themeLogoIconSelect.value = settings.logoIcon || 'fa-briefcase';
       }
 
       themeCards.forEach(card => {
@@ -620,8 +615,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     themeForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const title = themeTitleInput.value.trim() || 'Materiales Pro';
-      const logoIcon = themeLogoIconSelect ? themeLogoIconSelect.value : 'fa-cubes';
+      const title = themeTitleInput.value.trim() || 'Rodrigo Montero Durán';
+      const logoIcon = themeLogoIconSelect ? themeLogoIconSelect.value : 'fa-briefcase';
 
       const settings = {
         theme: selectedThemeValue,
@@ -630,6 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       localStorage.setItem('portal_visual_settings', JSON.stringify(settings));
+      localStorage.setItem('portal_config_updated_at', new Date().toISOString());
       applyVisualSettings();
       closeTheme();
     });
@@ -643,7 +639,9 @@ document.addEventListener('DOMContentLoaded', () => {
       btnExportConfig.addEventListener('click', () => {
         const repoConfigData = {
           visualSettings: getVisualSettings(),
-          materials: getMaterials()
+          materials: getMaterials(),
+          password: localStorage.getItem('portal_password') || DEFAULT_PASSWORD,
+          exportedAt: new Date().toISOString()
         };
 
         const jsonStr = JSON.stringify(repoConfigData, null, 2);
@@ -679,6 +677,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.materials && Array.isArray(data.materials)) {
               localStorage.setItem('portal_materials_list', JSON.stringify(data.materials));
             }
+            if (data.password) {
+              localStorage.setItem('portal_password', data.password);
+              currentPassword = data.password;
+            }
+            if (data.exportedAt) {
+              localStorage.setItem('portal_config_updated_at', data.exportedAt);
+            }
 
             applyVisualSettings();
             renderMaterials();
@@ -693,8 +698,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   }
-
-
 
   // Utilidad Escape HTML
   function escapeHtml(str) {
