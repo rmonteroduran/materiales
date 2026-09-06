@@ -357,11 +357,8 @@
   <!-- ==========================================================================
        MODAL: AJUSTES VISUALES Y DISEÑO DE LA APP
        ========================================================================== -->
-  <!-- ==========================================================================
-       MODAL: AJUSTES VISUALES Y DISEÑO DE LA APP
-       ========================================================================== -->
   <div id="themeModal" class="modal-overlay hidden">
-    <div class="modal-content glass-panel modal-wide">
+    <div class="modal-content glass-panel" style="max-width: 580px;">
       <div class="modal-header">
         <h3><i class="fas fa-palette gradient-text"></i> Personalización & Diseño</h3>
         <button id="closeThemeModal" class="btn-close-modal"><i class="fas fa-times"></i></button>
@@ -369,113 +366,78 @@
 
       <form id="themeForm">
         <div class="modal-body">
-          <div class="theme-modal-columns">
-            
-            <!-- Columna Izquierda: Personalización de Apariencia -->
-            <div class="theme-col-left">
-              <div class="form-group">
-                <label for="themeTitleInput">Título Principal de la App</label>
-                <input type="text" id="themeTitleInput" class="form-input" placeholder="Ej: Materiales Pro" required style="padding-left: 14px;">
-              </div>
+          <div class="form-group">
+            <label for="themeTitleInput">Título Principal de la App</label>
+            <input type="text" id="themeTitleInput" class="form-input" placeholder="Ej: Rodrigo Montero Durán" required style="padding-left: 14px;">
+          </div>
 
-              <div class="form-group">
-                <label for="themeLogoIconSelect">Icono Principal del Portal & Favicon</label>
-                <select id="themeLogoIconSelect" class="form-input" style="padding-left: 14px;">
-                  <option value="fa-cubes">🧊 Cubos Módulos (Default)</option>
-                  <option value="fa-layer-group">📚 Capas de Materiales</option>
-                  <option value="fa-rocket">🚀 Cohete / Innovación</option>
-                  <option value="fa-brain">🧠 Inteligencia / Estrategia</option>
-                  <option value="fa-briefcase">💼 Portafolio Ejecutivo</option>
-                  <option value="fa-laptop-code">💻 Desarrollo / Workshops</option>
-                </select>
-              </div>
+          <div class="form-group">
+            <label for="themeLogoIconSelect">Icono Principal del Portal & Favicon</label>
+            <select id="themeLogoIconSelect" class="form-input" style="padding-left: 14px;">
+              <option value="fa-briefcase">💼 Portafolio Ejecutivo</option>
+              <option value="fa-cubes">🧊 Cubos Módulos</option>
+              <option value="fa-layer-group">📚 Capas de Materiales</option>
+              <option value="fa-rocket">🚀 Cohete / Innovación</option>
+              <option value="fa-brain">🧠 Inteligencia / Estrategia</option>
+              <option value="fa-laptop-code">💻 Desarrollo / Workshops</option>
+            </select>
+          </div>
 
-              <div class="form-group">
-                <label>Tema de Color de la Interfaz</label>
-                <div class="theme-options-grid">
-                  <div class="theme-card active" data-theme-value="default">
-                    <div class="theme-preview-dot" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);"></div>
-                    <div>
-                      <strong style="display:block; font-size: 13px;">Neon Indigo</strong>
-                      <span style="font-size: 11px; color: var(--text-muted);">Por defecto</span>
-                    </div>
-                  </div>
-                  <div class="theme-card" data-theme-value="emerald">
-                    <div class="theme-preview-dot" style="background: linear-gradient(135deg, #10b981, #14b8a6);"></div>
-                    <div>
-                      <strong style="display:block; font-size: 13px;">Emerald Teal</strong>
-                      <span style="font-size: 11px; color: var(--text-muted);">Verde Menta</span>
-                    </div>
-                  </div>
-                  <div class="theme-card" data-theme-value="sunset">
-                    <div class="theme-preview-dot" style="background: linear-gradient(135deg, #f43f5e, #f59e0b);"></div>
-                    <div>
-                      <strong style="display:block; font-size: 13px;">Sunset Amber</strong>
-                      <span style="font-size: 11px; color: var(--text-muted);">Cálido Atardecer</span>
-                    </div>
-                  </div>
-                  <div class="theme-card" data-theme-value="cyber">
-                    <div class="theme-preview-dot" style="background: linear-gradient(135deg, #06b6d4, #d946ef);"></div>
-                    <div>
-                      <strong style="display:block; font-size: 13px;">Cyber Neón</strong>
-                      <span style="font-size: 11px; color: var(--text-muted);">Cian & Violeta</span>
-                    </div>
-                  </div>
-                  <div class="theme-card" data-theme-value="slate">
-                    <div class="theme-preview-dot" style="background: linear-gradient(135deg, #38bdf8, #64748b);"></div>
-                    <div>
-                      <strong style="display:block; font-size: 13px;">Slate Steel</strong>
-                      <span style="font-size: 11px; color: var(--text-muted);">Acero Elegante</span>
-                    </div>
-                  </div>
+          <div class="form-group">
+            <label>Tema de Color de la Interfaz</label>
+            <div class="theme-options-grid">
+              <div class="theme-card active" data-theme-value="default">
+                <div class="theme-preview-dot" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);"></div>
+                <div>
+                  <strong style="display:block; font-size: 13px;">Neon Indigo</strong>
+                  <span style="font-size: 11px; color: var(--text-muted);">Por defecto</span>
+                </div>
+              </div>
+              <div class="theme-card" data-theme-value="emerald">
+                <div class="theme-preview-dot" style="background: linear-gradient(135deg, #10b981, #14b8a6);"></div>
+                <div>
+                  <strong style="display:block; font-size: 13px;">Emerald Teal</strong>
+                  <span style="font-size: 11px; color: var(--text-muted);">Verde Menta</span>
+                </div>
+              </div>
+              <div class="theme-card" data-theme-value="sunset">
+                <div class="theme-preview-dot" style="background: linear-gradient(135deg, #f43f5e, #f59e0b);"></div>
+                <div>
+                  <strong style="display:block; font-size: 13px;">Sunset Amber</strong>
+                  <span style="font-size: 11px; color: var(--text-muted);">Cálido Atardecer</span>
+                </div>
+              </div>
+              <div class="theme-card" data-theme-value="cyber">
+                <div class="theme-preview-dot" style="background: linear-gradient(135deg, #06b6d4, #d946ef);"></div>
+                <div>
+                  <strong style="display:block; font-size: 13px;">Cyber Neón</strong>
+                  <span style="font-size: 11px; color: var(--text-muted);">Cian & Violeta</span>
+                </div>
+              </div>
+              <div class="theme-card" data-theme-value="slate">
+                <div class="theme-preview-dot" style="background: linear-gradient(135deg, #38bdf8, #64748b);"></div>
+                <div>
+                  <strong style="display:block; font-size: 13px;">Slate Steel</strong>
+                  <span style="font-size: 11px; color: var(--text-muted);">Acero Elegante</span>
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Columna Derecha: Sincronización y GitHub Sync -->
-            <div class="theme-col-right">
-              <div class="form-group" style="padding-bottom: 16px; border-bottom: 1px solid var(--glass-border);">
-                <label>Respaldo & Sincronización entre Navegadores</label>
-                <div style="display: flex; gap: 10px; margin-top: 8px;">
-                  <button type="button" id="btnExportConfig" class="btn-secondary" style="font-size: 12px; padding: 8px 12px;">
-                    <i class="fas fa-download"></i> Exportar Respaldo
-                  </button>
-                  <button type="button" id="btnImportConfig" class="btn-secondary" style="font-size: 12px; padding: 8px 12px;">
-                    <i class="fas fa-upload"></i> Cargar Respaldo
-                  </button>
-                  <input type="file" id="importFileInput" accept=".json" style="display: none;">
-                </div>
-                <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
-                  Exporta tu respaldo en un archivo .json para usar exactamente tus mismos temas, iconos y materiales en cualquier navegador o dispositivo.
-                </p>
-              </div>
-
-              <!-- Publicación Directa a GitHub (API) -->
-              <div class="form-group" style="margin-top: 16px;">
-                <label><i class="fab fa-github"></i> Publicar en GitHub sin Terminal (API Sync)</label>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
-                  <input type="text" id="ghOwnerInput" class="form-input" placeholder="Usuario GitHub (ej: rodrigomonteroduran)" style="padding-left: 10px; font-size: 12px;">
-                  <input type="text" id="ghRepoInput" class="form-input" placeholder="Repositorio (ej: materiales)" style="padding-left: 10px; font-size: 12px;">
-                </div>
-
-                <div style="margin-top: 8px;">
-                  <input type="password" id="ghTokenInput" class="form-input" placeholder="Token Personal de GitHub (PAT)" style="padding-left: 10px; font-size: 12px;">
-                </div>
-
-                <div style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-                  <button type="button" id="btnPublishToGitHub" class="btn-primary" style="width: auto; font-size: 12px; padding: 8px 14px;">
-                    <i class="fab fa-github"></i> Publicar Cambios en GitHub
-                  </button>
-                  <span id="ghSyncStatus" style="font-size: 11px; color: var(--accent-emerald);"></span>
-                </div>
-
-                <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
-                  Ingresa tu Token de GitHub (con permisos de <code>contents: write</code>). Los cambios en <code>config.json</code> se guardarán directamente en GitHub sin usar la consola.
-                </p>
-              </div>
+          <div class="form-group" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--glass-border);">
+            <label>Respaldo & Sincronización entre Navegadores</label>
+            <div style="display: flex; gap: 10px; margin-top: 8px;">
+              <button type="button" id="btnExportConfig" class="btn-secondary" style="font-size: 12px; padding: 8px 12px;">
+                <i class="fas fa-download"></i> Exportar Respaldo
+              </button>
+              <button type="button" id="btnImportConfig" class="btn-secondary" style="font-size: 12px; padding: 8px 12px;">
+                <i class="fas fa-upload"></i> Cargar Respaldo
+              </button>
+              <input type="file" id="importFileInput" accept=".json" style="display: none;">
             </div>
-
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
+              Exporta tu respaldo en un archivo .json para usar tus mismos temas y materiales en cualquier dispositivo.
+            </p>
           </div>
         </div>
 
@@ -486,6 +448,7 @@
       </form>
     </div>
   </div>
+
 
 
 
