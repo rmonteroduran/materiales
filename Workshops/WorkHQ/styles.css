@@ -638,6 +638,7 @@ h6 {
   cursor: pointer;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: flex-start;
   transition: var(--transition-fast);
   text-align: left;
@@ -656,7 +657,7 @@ h6 {
   font-weight: 700;
   font-size: 1rem;
   color: var(--text-secondary);
-  margin-top: 4px;
+  margin-top: 0;
 }
 
 .timeline-tab:hover {
@@ -1262,7 +1263,504 @@ h6 {
 }
 
 /* ==========================================================================
-   SLIDE 6: SS&C ARCHITECTURE & HISTORY
+   SLIDE 6: AUTOMATION ABSTRACTION PYRAMID & ORCHESTRATION
+   ========================================================================== */
+.pyramid-showcase-grid {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 22px;
+  align-items: stretch;
+  margin-top: 4px;
+}
+
+/* Columna Izquierda: Imagen 3D */
+.pyramid-image-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.pyramid-image-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-lg), 0 0 25px rgba(0, 210, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.pyramid-image-wrapper {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #060913;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pyramid-3d-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--transition-normal);
+  filter: contrast(1.05) brightness(1.02);
+  display: block;
+}
+
+.pyramid-image-card:hover .pyramid-3d-img {
+  transform: scale(1.02);
+}
+
+.pyramid-img-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 20%, rgba(0, 210, 255, 0.12) 0%, transparent 60%),
+              linear-gradient(to top, rgba(11, 15, 25, 0.75) 0%, transparent 35%);
+}
+
+/* Floating Interactive Tier Labels */
+.pyramid-float-tag {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(11, 15, 25, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  z-index: 5;
+}
+
+.pyramid-float-tag:hover,
+.pyramid-float-tag.active {
+  transform: scale(1.04);
+}
+
+.tag-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tag-body {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.tag-level {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.tag-name {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Positions & Colors for Floating Tags */
+.tag-tier-4 {
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-color: rgba(0, 210, 255, 0.5);
+  box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+}
+.tag-tier-4 .tag-pulse {
+  background: var(--accent-ssc);
+  box-shadow: 0 0 8px var(--accent-ssc);
+}
+.tag-tier-4 .tag-name {
+  color: var(--accent-ssc);
+}
+
+.tag-tier-3 {
+  top: 35%;
+  right: 12px;
+  border-color: rgba(168, 85, 247, 0.45);
+}
+.tag-tier-3 .tag-pulse {
+  background: var(--accent-violet);
+  box-shadow: 0 0 8px var(--accent-violet);
+}
+.tag-tier-3 .tag-name {
+  color: #c084fc;
+}
+
+.tag-tier-2 {
+  top: 58%;
+  left: 14px;
+  border-color: rgba(56, 189, 248, 0.45);
+}
+.tag-tier-2 .tag-pulse {
+  background: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan);
+}
+.tag-tier-2 .tag-name {
+  color: #38bdf8;
+}
+
+.tag-tier-1 {
+  bottom: 12px;
+  right: 14px;
+  border-color: rgba(148, 163, 184, 0.4);
+}
+.tag-tier-1 .tag-pulse {
+  background: #94a3b8;
+  box-shadow: 0 0 6px #94a3b8;
+}
+.tag-tier-1 .tag-name {
+  color: #cbd5e1;
+}
+
+/* Axis Indicator */
+.pyramid-side-axis {
+  position: absolute;
+  left: 10px;
+  top: 14px;
+  bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--accent-cyan);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  pointer-events: none;
+  opacity: 0.75;
+  text-shadow: 0 0 8px rgba(0, 210, 255, 0.6);
+}
+
+.pyramid-side-axis i {
+  font-size: 0.85rem;
+}
+
+.pyramid-card-footnote {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--accent-ssc);
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.pyramid-card-footnote i {
+  color: var(--accent-ssc);
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.pyramid-card-footnote p {
+  margin: 0;
+}
+
+/* Columna Derecha: Tarjetas de Capas */
+.pyramid-cards-column {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  justify-content: space-between;
+}
+
+.tier-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 11px 15px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: var(--transition-fast);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.tier-card:hover,
+.tier-card.active {
+  transform: translateX(4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Border accents per tier */
+.tier-card-4 {
+  border-left: 4px solid var(--accent-ssc);
+  background: linear-gradient(135deg, rgba(19, 26, 42, 0.95), rgba(0, 210, 255, 0.08));
+}
+.tier-card-4.active,
+.tier-card-4:hover {
+  border-color: var(--accent-ssc);
+  box-shadow: 0 0 25px rgba(0, 210, 255, 0.22);
+}
+
+.tier-card-3 {
+  border-left: 4px solid var(--accent-violet);
+}
+.tier-card-3.active,
+.tier-card-3:hover {
+  border-color: var(--accent-violet);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.22);
+}
+
+.tier-card-2 {
+  border-left: 4px solid var(--accent-cyan);
+}
+.tier-card-2.active,
+.tier-card-2:hover {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.22);
+}
+
+.tier-card-1 {
+  border-left: 4px solid #64748b;
+}
+.tier-card-1.active,
+.tier-card-1:hover {
+  border-color: #94a3b8;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.12);
+}
+
+/* Tier Card Header */
+.tier-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 3px;
+  flex-wrap: wrap;
+}
+
+.tier-card-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+}
+
+.badge-apex {
+  background: rgba(0, 210, 255, 0.2);
+  color: var(--accent-ssc);
+  border: 1px solid rgba(0, 210, 255, 0.4);
+}
+
+.badge-lowcode {
+  background: rgba(168, 85, 247, 0.18);
+  color: var(--accent-violet);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+}
+
+.badge-api {
+  background: rgba(56, 189, 248, 0.18);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.badge-code {
+  background: rgba(100, 116, 139, 0.25);
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.tier-card h3 {
+  font-size: 0.94rem;
+  color: var(--text-primary);
+  margin: 0;
+  flex: 1;
+}
+
+.tier-card-4 h3 {
+  font-size: 0.98rem;
+  color: #ffffff;
+}
+
+.tier-focus-pill {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.28);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.tier-card-desc {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  line-height: 1.35;
+}
+
+/* Tool Chips Row */
+.tier-tools-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tool-chip {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: var(--transition-fast);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.tool-chip:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.15);
+}
+
+/* Individual Brand Tool Chip Colors */
+.chip-workhq {
+  background: linear-gradient(135deg, rgba(0, 210, 255, 0.28), rgba(37, 99, 235, 0.28));
+  border-color: var(--accent-ssc);
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
+}
+.chip-workhq i {
+  color: #facc15;
+}
+
+.chip-rpa {
+  background: rgba(0, 210, 255, 0.12);
+  color: var(--accent-ssc);
+  border-color: rgba(0, 210, 255, 0.3);
+}
+
+.chip-hitl {
+  background: rgba(52, 211, 153, 0.15);
+  color: var(--accent-emerald);
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+.chip-ai {
+  background: rgba(168, 85, 247, 0.18);
+  color: #c084fc;
+  border-color: rgba(168, 85, 247, 0.35);
+}
+
+.chip-bp {
+  background: rgba(0, 163, 224, 0.15);
+  color: #38bdf8;
+  border-color: rgba(0, 163, 224, 0.35);
+}
+
+.chip-uipath {
+  background: rgba(250, 70, 22, 0.15);
+  color: #fb923c;
+  border-color: rgba(250, 70, 22, 0.35);
+}
+
+.chip-aa {
+  background: rgba(255, 158, 27, 0.15);
+  color: #f59e0b;
+  border-color: rgba(255, 158, 27, 0.35);
+}
+
+.chip-decipher {
+  background: rgba(0, 201, 167, 0.15);
+  color: #2dd4bf;
+  border-color: rgba(0, 201, 167, 0.35);
+}
+
+.chip-chorus {
+  background: rgba(99, 102, 241, 0.18);
+  color: #a5b4fc;
+  border-color: rgba(99, 102, 241, 0.35);
+}
+
+.chip-ipaas {
+  background: rgba(2, 132, 199, 0.18);
+  color: #67e8f9;
+  border-color: rgba(2, 132, 199, 0.35);
+}
+
+.chip-api {
+  background: rgba(56, 189, 248, 0.15);
+  color: #7dd3fc;
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.chip-pw {
+  background: rgba(34, 197, 94, 0.15);
+  color: #86efac;
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.chip-kafka {
+  background: rgba(234, 88, 12, 0.15);
+  color: #fdba74;
+  border-color: rgba(234, 88, 12, 0.3);
+}
+
+.chip-python {
+  background: rgba(56, 189, 248, 0.15);
+  color: #fde047;
+  border-color: rgba(250, 204, 21, 0.3);
+}
+
+.chip-shell {
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+  border-color: rgba(74, 222, 128, 0.3);
+}
+
+.chip-excel {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.chip-ahk {
+  background: rgba(20, 184, 166, 0.15);
+  color: #5eead4;
+  border-color: rgba(20, 184, 166, 0.3);
+}
+
+/* ==========================================================================
+   SLIDE 7: SS&C ARCHITECTURE & HISTORY
    ========================================================================== */
 .ssc-architecture-layout {
   display: flex;

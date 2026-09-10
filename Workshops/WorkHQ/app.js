@@ -6,7 +6,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   // State Variables
   let currentSlide = 0;
-  const totalSlides = 7;
   let isReadingMode = false;
   let isSimulating = false;
   let simTimeout = null;
@@ -14,8 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // DOM Element References
   const deckContainer = document.getElementById('deck-container');
   const slides = Array.from(document.querySelectorAll('.slide'));
+  const totalSlides = slides.length ? (slides.length - 1) : 8;
   const currentSlideEl = document.getElementById('current-slide');
   const totalSlidesEl = document.getElementById('total-slides');
+  if (totalSlidesEl) totalSlidesEl.textContent = totalSlides;
   const progressBar = document.getElementById('progress-bar');
   const dotsContainer = document.getElementById('dots-container');
   
@@ -404,7 +405,36 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ==========================================================================
-     SLIDE 6: SS&C Architecture Component Switcher
+     SLIDE 6: Interactive Automation Abstraction Pyramid & Tier Cards
+     ========================================================================== */
+  const tierCards = document.querySelectorAll('.tier-card');
+  const pyramidTags = document.querySelectorAll('.pyramid-float-tag');
+
+  function selectPyramidTier(tierNum) {
+    tierCards.forEach(card => {
+      card.classList.toggle('active', card.getAttribute('data-tier') === String(tierNum));
+    });
+    pyramidTags.forEach(tag => {
+      tag.classList.toggle('active', tag.getAttribute('data-target-tier') === String(tierNum));
+    });
+  }
+
+  tierCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const tierNum = card.getAttribute('data-tier');
+      selectPyramidTier(tierNum);
+    });
+  });
+
+  pyramidTags.forEach(tag => {
+    tag.addEventListener('click', () => {
+      const tierNum = tag.getAttribute('data-target-tier');
+      selectPyramidTier(tierNum);
+    });
+  });
+
+  /* ==========================================================================
+     SLIDE 7: SS&C Architecture Component Switcher
      ========================================================================== */
   const archBoxes = document.querySelectorAll('.arch-box');
   const archInfos = document.querySelectorAll('.arch-info-card');
