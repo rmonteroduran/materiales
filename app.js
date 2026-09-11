@@ -22,6 +22,41 @@ document.addEventListener('DOMContentLoaded', () => {
       tags: ['WorkHQ', 'SS&C', 'Workshop', 'Capacitación'],
       bannerBg: 'linear-gradient(135deg, #0284c7, #6366f1)',
       icon: 'fa-graduation-cap'
+    },
+    {
+      id: 'clase-01-entornos-virtualizados',
+      title: 'Clase 01 - Introducción a Entornos Virtualizados',
+      category: 'presentaciones',
+      folder: 'Entornos Virtualizados',
+      description: 'Qué es la virtualización, conceptos clave, retos, hipervisores, infraestructura virtual, cloud computing y mapa de herramientas.',
+      url: './Presentaciones/Entornos Virtualizados/clase_01_introduccion_entornos_virtualizados_para_teams/clase_01_introduccion_entornos_virtualizados.html',
+      tags: ['Entornos Virtualizados', 'Virtualización', 'Hipervisores', 'Cloud', 'UTN'],
+      bannerBg: 'linear-gradient(135deg, #0f766e, #0284c7)',
+      icon: 'fa-file-powerpoint'
+    },
+    {
+      id: 'clase-02-arquitecturas-vm-contenedores',
+      title: 'Clase 02 - Arquitecturas de Virtualización, VM y Contenedores',
+      category: 'presentaciones',
+      folder: 'Entornos Virtualizados',
+      description: 'Arquitecturas de virtualización, componentes de una plataforma, máquinas virtuales, contenedores y criterios de decisión.',
+      url: './Presentaciones/Entornos Virtualizados/clase_02_arquitecturas_vm_contenedores_para_teams/clase_02_arquitecturas_vm_contenedores.html',
+      tags: ['Entornos Virtualizados', 'Arquitectura', 'VM', 'Contenedores', 'Docker'],
+      bannerBg: 'linear-gradient(135deg, #0f766e, #6366f1)',
+      icon: 'fa-file-powerpoint'
+    }
+  ];
+
+  // Carpetas Iniciales predeterminadas
+  const DEFAULT_FOLDERS = [
+    {
+      id: 'folder-entornos-virtualizados',
+      name: 'Entornos Virtualizados',
+      category: 'presentaciones',
+      description: 'Clases, arquitecturas y material didáctico de Entornos Virtualizados.',
+      icon: 'fa-folder',
+      bannerBg: 'linear-gradient(135deg, #0f766e, #14b8a6)',
+      color: 'emerald'
     }
   ];
 
@@ -53,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentUser = localStorage.getItem('portal_logged_user') || null;
   let activeTab = 'all';
   let searchQuery = '';
+  let currentFolder = null;
 
   // Elementos DOM - Autenticación
   const authScreen = document.getElementById('authScreen');
@@ -77,8 +113,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabBtns = document.querySelectorAll('.tab-btn');
   const cardsGrid = document.getElementById('cardsGrid');
   const emptyState = document.getElementById('emptyState');
+
+  // Elementos DOM - Navegación de Carpetas (Breadcrumbs)
+  const folderBreadcrumbs = document.getElementById('folderBreadcrumbs');
+  const breadcrumbsPath = document.getElementById('breadcrumbsPath');
+  const btnBackBreadcrumb = document.getElementById('btnBackBreadcrumb');
+  const btnEditCurrentFolder = document.getElementById('btnEditCurrentFolder');
+  const btnDeleteCurrentFolder = document.getElementById('btnDeleteCurrentFolder');
   
-  // Elementos DOM - Modales
+  // Elementos DOM - Modales de Materiales
   const passwordModal = document.getElementById('passwordModal');
   const closePasswordModal = document.getElementById('closePasswordModal');
   const cancelPasswordModal = document.getElementById('cancelPasswordModal');
@@ -93,6 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeAddModal = document.getElementById('closeAddModal');
   const cancelAddModal = document.getElementById('cancelAddModal');
   const addMaterialForm = document.getElementById('addMaterialForm');
+  const matCategorySelect = document.getElementById('matCategorySelect');
+  const matFolderSelect = document.getElementById('matFolderSelect');
   const matIconSelect = document.getElementById('matIconSelect');
 
   const editMaterialModal = document.getElementById('editMaterialModal');
@@ -102,11 +147,34 @@ document.addEventListener('DOMContentLoaded', () => {
   const editMatIdInput = document.getElementById('editMatIdInput');
   const editMatTitleInput = document.getElementById('editMatTitleInput');
   const editMatCategorySelect = document.getElementById('editMatCategorySelect');
+  const editMatFolderSelect = document.getElementById('editMatFolderSelect');
   const editMatIconSelect = document.getElementById('editMatIconSelect');
   const editMatUrlInput = document.getElementById('editMatUrlInput');
   const editMatDescInput = document.getElementById('editMatDescInput');
   const editMatTagsInput = document.getElementById('editMatTagsInput');
   const btnDeleteMaterial = document.getElementById('btnDeleteMaterial');
+
+  // Elementos DOM - Modales de Carpetas
+  const addFolderModal = document.getElementById('addFolderModal');
+  const btnOpenAddFolderModal = document.getElementById('btnOpenAddFolderModal');
+  const closeAddFolderModal = document.getElementById('closeAddFolderModal');
+  const cancelAddFolderModal = document.getElementById('cancelAddFolderModal');
+  const addFolderForm = document.getElementById('addFolderForm');
+  const folderNameInput = document.getElementById('folderNameInput');
+  const folderCategorySelect = document.getElementById('folderCategorySelect');
+  const folderDescInput = document.getElementById('folderDescInput');
+  const folderColorSelect = document.getElementById('folderColorSelect');
+
+  const editFolderModal = document.getElementById('editFolderModal');
+  const closeEditFolderModal = document.getElementById('closeEditFolderModal');
+  const cancelEditFolderModal = document.getElementById('cancelEditFolderModal');
+  const editFolderForm = document.getElementById('editFolderForm');
+  const editFolderIdInput = document.getElementById('editFolderIdInput');
+  const editFolderNameInput = document.getElementById('editFolderNameInput');
+  const editFolderCategorySelect = document.getElementById('editFolderCategorySelect');
+  const editFolderDescInput = document.getElementById('editFolderDescInput');
+  const editFolderColorSelect = document.getElementById('editFolderColorSelect');
+  const btnDeleteFolderModal = document.getElementById('btnDeleteFolderModal');
 
   const themeModal = document.getElementById('themeModal');
   const closeThemeModal = document.getElementById('closeThemeModal');
@@ -136,6 +204,9 @@ document.addEventListener('DOMContentLoaded', () => {
           if (repoData.visualSettings) {
             localStorage.setItem('portal_visual_settings', JSON.stringify(repoData.visualSettings));
           }
+          if (repoData.folders) {
+            localStorage.setItem('portal_folders_list', JSON.stringify(repoData.folders));
+          }
           if (repoData.materials) {
             localStorage.setItem('portal_materials_list', JSON.stringify(repoData.materials));
           }
@@ -155,6 +226,35 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (e) {
       console.log('Falla al cargar config.json o ejecutando localmente:', e);
+      try {
+        const currentList = JSON.parse(localStorage.getItem('portal_materials_list') || '[]');
+        const existingIds = new Set(currentList.map(m => m.id));
+        const missingDefaults = DEFAULT_MATERIALS.filter(m => !existingIds.has(m.id));
+        let updatedMaterials = [...currentList, ...missingDefaults];
+
+        // Asegurar que items por defecto tengan su carpeta asignada
+        updatedMaterials.forEach(m => {
+          const def = DEFAULT_MATERIALS.find(d => d.id === m.id);
+          if (def && def.folder && !m.folder) {
+            m.folder = def.folder;
+          }
+        });
+        localStorage.setItem('portal_materials_list', JSON.stringify(updatedMaterials));
+
+        const currentFolders = JSON.parse(localStorage.getItem('portal_folders_list') || '[]');
+        const existingFolderNames = new Set(currentFolders.map(f => f.name));
+        const missingFolders = DEFAULT_FOLDERS.filter(f => !existingFolderNames.has(f.name));
+        if (missingFolders.length > 0) {
+          const mergedFolders = [...currentFolders, ...missingFolders];
+          localStorage.setItem('portal_folders_list', JSON.stringify(mergedFolders));
+        }
+
+        if (currentUser) {
+          renderMaterials();
+        }
+      } catch (err) {
+        console.error('Error sincronizando materiales/carpetas locales:', err);
+      }
     }
   }
 
@@ -290,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
     authAlert.classList.remove('hidden');
   }
 
-  // --- 2. GESTIÓN DE MATERIALES, ALMACENAMIENTO Y EDICIÓN ---
+  // --- 2. GESTIÓN DE MATERIALES, CARPETAS Y ALMACENAMIENTO ---
 
   function getMaterials() {
     const saved = localStorage.getItem('portal_materials_list');
@@ -312,6 +412,24 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('portal_config_updated_at', new Date().toISOString());
   }
 
+  function getFolders() {
+    const saved = localStorage.getItem('portal_folders_list');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (err) {
+        console.error('Error al parsear carpetas:', err);
+      }
+    }
+    localStorage.setItem('portal_folders_list', JSON.stringify(DEFAULT_FOLDERS));
+    return DEFAULT_FOLDERS;
+  }
+
+  function saveFolders(list) {
+    localStorage.setItem('portal_folders_list', JSON.stringify(list));
+    localStorage.setItem('portal_config_updated_at', new Date().toISOString());
+  }
+
   function getBannerForCategory(category) {
     switch(category) {
       case 'workshops': return 'linear-gradient(135deg, #0284c7, #6366f1)';
@@ -321,74 +439,263 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function getBannerForFolder(color) {
+    switch(color) {
+      case 'emerald': return 'linear-gradient(135deg, #059669, #0d9488)';
+      case 'indigo': return 'linear-gradient(135deg, #4f46e5, #6366f1)';
+      case 'amber': return 'linear-gradient(135deg, #d97706, #f59e0b)';
+      case 'rose': return 'linear-gradient(135deg, #e11d48, #f43f5e)';
+      case 'cyan': return 'linear-gradient(135deg, #0284c7, #06b6d4)';
+      default: return 'linear-gradient(135deg, #059669, #0d9488)';
+    }
+  }
+
+  function populateFolderSelect(selectElem, category, selectedValue = '') {
+    if (!selectElem) return;
+    const folders = getFolders();
+    const matching = folders.filter(f => !category || f.category === category);
+
+    selectElem.innerHTML = '<option value="">(Nivel Raíz - Sin Carpeta)</option>';
+    matching.forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f.name;
+      opt.textContent = `📁 ${f.name}`;
+      if (f.name === selectedValue) {
+        opt.selected = true;
+      }
+      selectElem.appendChild(opt);
+    });
+  }
+
+  function openFolder(folderName) {
+    currentFolder = folderName;
+    const folders = getFolders();
+    const folder = folders.find(f => f.name === folderName);
+    if (folder && activeTab !== 'all' && activeTab !== folder.category) {
+      activeTab = folder.category;
+      tabBtns.forEach(b => {
+        b.classList.toggle('active', b.dataset.tab === activeTab);
+      });
+    }
+    renderMaterials();
+  }
+
+  function renderFolderCard(folder, materials) {
+    const card = document.createElement('div');
+    card.className = 'folder-card glass-panel';
+
+    const itemsCount = materials.filter(m => m.folder === folder.name).length;
+    const categoryLabel = {
+      workshops: 'Workshops',
+      presentaciones: 'Presentaciones',
+      proyectos: 'Proyectos'
+    }[folder.category] || folder.category;
+
+    const badgeClass = `badge-${folder.category}`;
+    const countText = `${itemsCount} ${itemsCount === 1 ? (folder.category === 'presentaciones' ? 'presentación' : 'material') : (folder.category === 'presentaciones' ? 'presentaciones' : 'materiales')}`;
+
+    card.innerHTML = `
+      <div class="card-banner" style="background: ${folder.bannerBg || getBannerForFolder(folder.color)}">
+        <div class="card-banner-content">
+          <div class="card-icon-badge">
+            <i class="fas fa-folder-open folder-icon-large"></i>
+          </div>
+          <span class="card-category-badge ${badgeClass}">${categoryLabel}</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title"><i class="fas fa-folder" style="color: var(--accent-primary); margin-right: 6px;"></i> ${escapeHtml(folder.name)}</h3>
+        <p class="card-description">${escapeHtml(folder.description || 'Carpeta organizada de materiales y recursos.')}</p>
+        <div class="folder-items-count">
+          <i class="fas fa-layer-group"></i> ${countText}
+        </div>
+        <div class="card-footer" style="margin-top: 18px;">
+          <button class="btn-card-edit btn-folder-edit" data-name="${escapeHtml(folder.name)}" title="Editar esta carpeta">
+            <i class="fas fa-edit"></i> Editar
+          </button>
+          <button class="btn-card-folder-open btn-folder-enter" data-name="${escapeHtml(folder.name)}">
+            Abrir Carpeta <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    `;
+
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.btn-folder-edit')) {
+        e.stopPropagation();
+        openEditFolderModal(folder.name);
+      } else {
+        openFolder(folder.name);
+      }
+    });
+
+    cardsGrid.appendChild(card);
+  }
+
+  function renderMaterialCard(item, showFolderBadge = false) {
+    const card = document.createElement('div');
+    card.className = 'material-card glass-panel';
+
+    const categoryLabel = {
+      workshops: 'Workshop',
+      presentaciones: 'Presentación',
+      proyectos: 'Proyecto'
+    }[item.category] || item.category;
+
+    const badgeClass = `badge-${item.category}`;
+    const itemIcon = item.icon || (item.category === 'workshops' ? 'fa-laptop-code' : item.category === 'presentaciones' ? 'fa-file-powerpoint' : 'fa-project-diagram');
+
+    const folderBadgeHtml = (showFolderBadge && item.folder) ? `
+      <div class="folder-origin-tag">
+        <i class="fas fa-folder"></i> ${escapeHtml(item.folder)}
+      </div>
+    ` : '';
+
+    card.innerHTML = `
+      <div class="card-banner" style="background: ${item.bannerBg || getBannerForCategory(item.category)}">
+        <div class="card-banner-content">
+          <div class="card-icon-badge">
+            <i class="fas ${itemIcon}"></i>
+          </div>
+          <span class="card-category-badge ${badgeClass}">${categoryLabel}</span>
+        </div>
+      </div>
+      <div class="card-body">
+        ${folderBadgeHtml}
+        <h3 class="card-title">${escapeHtml(item.title)}</h3>
+        <p class="card-description">${escapeHtml(item.description)}</p>
+        <div class="card-tags">
+          ${(item.tags || []).map(t => `<span class="tag">#${escapeHtml(t)}</span>`).join('')}
+        </div>
+        <div class="card-footer">
+          <button class="btn-card-edit" data-id="${item.id}" title="Editar este material">
+            <i class="fas fa-edit"></i> Editar
+          </button>
+          <a href="${item.url}" ${item.url.startsWith('http') || item.url.includes('.html') ? 'target="_blank"' : ''} class="btn-card-action">
+            Abrir Web <i class="fas fa-external-link-alt"></i>
+          </a>
+        </div>
+      </div>
+    `;
+
+    const editBtn = card.querySelector('.btn-card-edit');
+    editBtn.addEventListener('click', () => openEditModal(item.id));
+
+    cardsGrid.appendChild(card);
+  }
+
   function renderMaterials() {
     const materials = getMaterials();
+    const folders = getFolders();
     cardsGrid.innerHTML = '';
-
-    const filtered = materials.filter(item => {
-      const matchesTab = (activeTab === 'all') || (item.category === activeTab);
-      const query = searchQuery.toLowerCase();
-      const matchesSearch = item.title.toLowerCase().includes(query) ||
-                            item.description.toLowerCase().includes(query) ||
-                            (item.tags && item.tags.some(t => t.toLowerCase().includes(query)));
-      return matchesTab && matchesSearch;
-    });
 
     updateTabCounts(materials);
 
-    if (filtered.length === 0) {
-      cardsGrid.classList.add('hidden');
-      emptyState.classList.remove('hidden');
+    const isSearching = searchQuery.trim() !== '';
+
+    if (isSearching) {
+      if (folderBreadcrumbs) folderBreadcrumbs.classList.add('hidden');
+      const query = searchQuery.toLowerCase();
+      const filtered = materials.filter(item => {
+        const matchesTab = (activeTab === 'all') || (item.category === activeTab);
+        const matchesSearch = item.title.toLowerCase().includes(query) ||
+                              item.description.toLowerCase().includes(query) ||
+                              (item.folder && item.folder.toLowerCase().includes(query)) ||
+                              (item.tags && item.tags.some(t => t.toLowerCase().includes(query)));
+        return matchesTab && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        cardsGrid.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        emptyState.querySelector('h3').textContent = 'No se encontraron materiales';
+        emptyState.querySelector('p').textContent = 'Intenta con otras palabras clave o busca en otra categoría.';
+        return;
+      }
+
+      cardsGrid.classList.remove('hidden');
+      emptyState.classList.add('hidden');
+
+      filtered.forEach(item => {
+        renderMaterialCard(item, true);
+      });
       return;
     }
 
-    cardsGrid.classList.remove('hidden');
-    emptyState.classList.add('hidden');
+    // Navegación jerárquica (sin búsqueda)
+    if (currentFolder !== null) {
+      const activeFolderObj = folders.find(f => f.name === currentFolder);
+      if (folderBreadcrumbs) folderBreadcrumbs.classList.remove('hidden');
 
-    filtered.forEach(item => {
-      const card = document.createElement('div');
-      card.className = 'material-card glass-panel';
+      const categoryName = {
+        workshops: 'Workshops',
+        presentaciones: 'Presentaciones',
+        proyectos: 'Proyectos'
+      }[activeFolderObj ? activeFolderObj.category : activeTab] || 'Apartado';
 
-      const categoryLabel = {
-        workshops: 'Workshop',
-        presentaciones: 'Presentación',
-        proyectos: 'Proyecto'
-      }[item.category] || item.category;
+      if (breadcrumbsPath) {
+        breadcrumbsPath.innerHTML = `
+          <span class="breadcrumb-crumb" id="breadcrumbRootTab"><i class="fas fa-th-large"></i> ${escapeHtml(categoryName)}</span>
+          <span class="breadcrumb-sep"><i class="fas fa-chevron-right"></i></span>
+          <span class="breadcrumb-current"><i class="fas fa-folder-open"></i> ${escapeHtml(currentFolder)}</span>
+        `;
 
-      const badgeClass = `badge-${item.category}`;
-      const itemIcon = item.icon || (item.category === 'workshops' ? 'fa-laptop-code' : item.category === 'presentaciones' ? 'fa-file-powerpoint' : 'fa-project-diagram');
+        const breadcrumbRootTab = document.getElementById('breadcrumbRootTab');
+        if (breadcrumbRootTab) {
+          breadcrumbRootTab.addEventListener('click', () => {
+            currentFolder = null;
+            renderMaterials();
+          });
+        }
+      }
 
-      card.innerHTML = `
-        <div class="card-banner" style="background: ${item.bannerBg || getBannerForCategory(item.category)}">
-          <div class="card-banner-content">
-            <div class="card-icon-badge">
-              <i class="fas ${itemIcon}"></i>
-            </div>
-            <span class="card-category-badge ${badgeClass}">${categoryLabel}</span>
-          </div>
-        </div>
-        <div class="card-body">
-          <h3 class="card-title">${escapeHtml(item.title)}</h3>
-          <p class="card-description">${escapeHtml(item.description)}</p>
-          <div class="card-tags">
-            ${(item.tags || []).map(t => `<span class="tag">#${escapeHtml(t)}</span>`).join('')}
-          </div>
-          <div class="card-footer">
-            <button class="btn-card-edit" data-id="${item.id}" title="Editar este material">
-              <i class="fas fa-edit"></i> Editar
-            </button>
-            <a href="${item.url}" ${item.url.startsWith('http') || item.url.includes('.html') ? 'target="_blank"' : ''} class="btn-card-action">
-              Abrir Web <i class="fas fa-external-link-alt"></i>
-            </a>
-          </div>
-        </div>
-      `;
+      const folderMaterials = materials.filter(m => m.folder === currentFolder);
 
-      const editBtn = card.querySelector('.btn-card-edit');
-      editBtn.addEventListener('click', () => openEditModal(item.id));
+      if (folderMaterials.length === 0) {
+        cardsGrid.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        emptyState.querySelector('h3').textContent = 'Esta carpeta está vacía';
+        emptyState.querySelector('p').textContent = 'Puedes agregar o mover materiales a esta carpeta con el botón "Nuevo Material".';
+        return;
+      }
 
-      cardsGrid.appendChild(card);
-    });
+      cardsGrid.classList.remove('hidden');
+      emptyState.classList.add('hidden');
+
+      folderMaterials.forEach(item => {
+        renderMaterialCard(item, false);
+      });
+    } else {
+      if (folderBreadcrumbs) folderBreadcrumbs.classList.add('hidden');
+
+      const matchingFolders = folders.filter(f => (activeTab === 'all') || (f.category === activeTab));
+      const matchingMaterials = materials.filter(m => {
+        const isRoot = !m.folder;
+        const matchesTab = (activeTab === 'all') || (m.category === activeTab);
+        return isRoot && matchesTab;
+      });
+
+      if (matchingFolders.length === 0 && matchingMaterials.length === 0) {
+        cardsGrid.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        emptyState.querySelector('h3').textContent = 'No se encontraron materiales ni carpetas';
+        emptyState.querySelector('p').textContent = 'Intenta ajustar la búsqueda o seleccionar otra categoría en el menú superior.';
+        return;
+      }
+
+      cardsGrid.classList.remove('hidden');
+      emptyState.classList.add('hidden');
+
+      // 1. Renderizar Carpetas primero
+      matchingFolders.forEach(folder => {
+        renderFolderCard(folder, materials);
+      });
+
+      // 2. Renderizar Materiales de la raíz
+      matchingMaterials.forEach(item => {
+        renderMaterialCard(item, false);
+      });
+    }
   }
 
   function updateTabCounts(materials) {
@@ -411,6 +718,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tabBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       activeTab = btn.dataset.tab;
+      currentFolder = null;
       renderMaterials();
     });
   });
@@ -419,6 +727,30 @@ document.addEventListener('DOMContentLoaded', () => {
     searchQuery = e.target.value;
     renderMaterials();
   });
+
+  // Eventos de Breadcrumbs
+  if (btnBackBreadcrumb) {
+    btnBackBreadcrumb.addEventListener('click', () => {
+      currentFolder = null;
+      renderMaterials();
+    });
+  }
+
+  if (btnEditCurrentFolder) {
+    btnEditCurrentFolder.addEventListener('click', () => {
+      if (currentFolder) {
+        openEditFolderModal(currentFolder);
+      }
+    });
+  }
+
+  if (btnDeleteCurrentFolder) {
+    btnDeleteCurrentFolder.addEventListener('click', () => {
+      if (currentFolder) {
+        deleteFolderByName(currentFolder);
+      }
+    });
+  }
 
   // --- 3. CAMBIO DE CONTRASEÑA ---
 
@@ -452,15 +784,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (next !== confirm) {
-      showPassAlert('Las contraseñas nuevas no coinciden.');
+      showPassAlert('Las contraseñas no coinciden.');
       return;
     }
 
     currentPassword = next;
     localStorage.setItem('portal_password', currentPassword);
     localStorage.setItem('portal_config_updated_at', new Date().toISOString());
-    alert('¡Contraseña actualizada exitosamente!');
     closePassModal();
+    alert('¡Contraseña actualizada exitosamente!');
   });
 
   function showPassAlert(msg) {
@@ -473,8 +805,18 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnOpenAddModal) {
     btnOpenAddModal.addEventListener('click', () => {
       addMaterialForm.reset();
+      if (activeTab !== 'all') {
+        matCategorySelect.value = activeTab;
+      }
+      populateFolderSelect(matFolderSelect, matCategorySelect.value, currentFolder || '');
       addMaterialModal.classList.remove('hidden');
     });
+
+    if (matCategorySelect) {
+      matCategorySelect.addEventListener('change', () => {
+        populateFolderSelect(matFolderSelect, matCategorySelect.value, matFolderSelect.value);
+      });
+    }
 
     const closeAdd = () => addMaterialModal.classList.add('hidden');
     closeAddModal.addEventListener('click', closeAdd);
@@ -483,7 +825,8 @@ document.addEventListener('DOMContentLoaded', () => {
     addMaterialForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const title = document.getElementById('matTitleInput').value.trim();
-      const category = document.getElementById('matCategorySelect').value;
+      const category = matCategorySelect.value;
+      const folderVal = matFolderSelect ? matFolderSelect.value.trim() : '';
       const icon = matIconSelect ? matIconSelect.value : 'fa-laptop-code';
       const url = document.getElementById('matUrlInput').value.trim();
       const description = document.getElementById('matDescInput').value.trim();
@@ -495,6 +838,7 @@ document.addEventListener('DOMContentLoaded', () => {
         id: 'mat-' + Date.now(),
         title,
         category,
+        folder: folderVal || null,
         icon,
         url: url || '#',
         description,
@@ -522,6 +866,7 @@ document.addEventListener('DOMContentLoaded', () => {
     editMatIdInput.value = item.id;
     editMatTitleInput.value = item.title;
     editMatCategorySelect.value = item.category;
+    populateFolderSelect(editMatFolderSelect, item.category, item.folder || '');
     if (editMatIconSelect) {
       editMatIconSelect.value = item.icon || 'fa-laptop-code';
     }
@@ -530,6 +875,12 @@ document.addEventListener('DOMContentLoaded', () => {
     editMatTagsInput.value = (item.tags || []).join(', ');
 
     editMaterialModal.classList.remove('hidden');
+  }
+
+  if (editMatCategorySelect) {
+    editMatCategorySelect.addEventListener('change', () => {
+      populateFolderSelect(editMatFolderSelect, editMatCategorySelect.value, editMatFolderSelect.value);
+    });
   }
 
   function closeEdit() {
@@ -548,6 +899,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (index === -1) return;
 
     const category = editMatCategorySelect.value;
+    const folderVal = editMatFolderSelect ? editMatFolderSelect.value.trim() : '';
     const icon = editMatIconSelect ? editMatIconSelect.value : 'fa-laptop-code';
     const tagsRaw = editMatTagsInput.value.trim();
 
@@ -555,6 +907,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ...materials[index],
       title: editMatTitleInput.value.trim(),
       category: category,
+      folder: folderVal || null,
       icon: icon,
       url: editMatUrlInput.value.trim(),
       description: editMatDescInput.value.trim(),
@@ -580,7 +933,146 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // --- 6. MODAL DE CONFIGURACIÓN VISUAL Y TEMA ---
+  // --- 6. GESTIÓN DE CARPETAS (CREAR, EDITAR, ELIMINAR) ---
+
+  if (btnOpenAddFolderModal) {
+    btnOpenAddFolderModal.addEventListener('click', () => {
+      addFolderForm.reset();
+      if (activeTab !== 'all') {
+        folderCategorySelect.value = activeTab;
+      }
+      addFolderModal.classList.remove('hidden');
+    });
+
+    const closeAddFolder = () => addFolderModal.classList.add('hidden');
+    if (closeAddFolderModal) closeAddFolderModal.addEventListener('click', closeAddFolder);
+    if (cancelAddFolderModal) cancelAddFolderModal.addEventListener('click', closeAddFolder);
+
+    addFolderForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = folderNameInput.value.trim();
+      const category = folderCategorySelect.value;
+      const description = folderDescInput.value.trim();
+      const color = folderColorSelect.value;
+
+      if (!name) return;
+
+      const folders = getFolders();
+      if (folders.some(f => f.name.toLowerCase() === name.toLowerCase() && f.category === category)) {
+        alert('Ya existe una carpeta con este nombre en este apartado.');
+        return;
+      }
+
+      const newFolder = {
+        id: 'folder-' + Date.now(),
+        name,
+        category,
+        description,
+        color,
+        bannerBg: getBannerForFolder(color),
+        icon: 'fa-folder'
+      };
+
+      folders.push(newFolder);
+      saveFolders(folders);
+      closeAddFolder();
+      renderMaterials();
+    });
+  }
+
+  function openEditFolderModal(folderName) {
+    const folders = getFolders();
+    const folder = folders.find(f => f.name === folderName);
+    if (!folder) return;
+
+    editFolderIdInput.value = folder.id || folder.name;
+    editFolderNameInput.value = folder.name;
+    editFolderCategorySelect.value = folder.category || 'presentaciones';
+    editFolderDescInput.value = folder.description || '';
+    editFolderColorSelect.value = folder.color || 'emerald';
+
+    editFolderModal.classList.remove('hidden');
+  }
+
+  const closeEditFolder = () => editFolderModal.classList.add('hidden');
+  if (closeEditFolderModal) closeEditFolderModal.addEventListener('click', closeEditFolder);
+  if (cancelEditFolderModal) cancelEditFolderModal.addEventListener('click', closeEditFolder);
+
+  if (editFolderForm) {
+    editFolderForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = editFolderIdInput.value;
+      const folders = getFolders();
+      const index = folders.findIndex(f => (f.id === id || f.name === id));
+      if (index === -1) return;
+
+      const oldName = folders[index].name;
+      const newName = editFolderNameInput.value.trim();
+      const category = editFolderCategorySelect.value;
+      const description = editFolderDescInput.value.trim();
+      const color = editFolderColorSelect.value;
+
+      folders[index] = {
+        ...folders[index],
+        name: newName,
+        category,
+        description,
+        color,
+        bannerBg: getBannerForFolder(color)
+      };
+
+      saveFolders(folders);
+
+      if (oldName !== newName) {
+        const materials = getMaterials();
+        materials.forEach(m => {
+          if (m.folder === oldName) {
+            m.folder = newName;
+          }
+        });
+        saveMaterials(materials);
+
+        if (currentFolder === oldName) {
+          currentFolder = newName;
+        }
+      }
+
+      closeEditFolder();
+      renderMaterials();
+    });
+  }
+
+  function deleteFolderByName(folderName) {
+    if (!folderName) return;
+    if (confirm(`¿Estás seguro de que deseas eliminar la carpeta "${folderName}"? Los materiales contenidos no se borrarán; volverán al nivel raíz.`)) {
+      const folders = getFolders();
+      const updatedFolders = folders.filter(f => f.name !== folderName);
+      saveFolders(updatedFolders);
+
+      const materials = getMaterials();
+      materials.forEach(m => {
+        if (m.folder === folderName) {
+          delete m.folder;
+        }
+      });
+      saveMaterials(materials);
+
+      if (currentFolder === folderName) {
+        currentFolder = null;
+      }
+      closeEditFolder();
+      renderMaterials();
+    }
+  }
+
+  if (btnDeleteFolderModal) {
+    btnDeleteFolderModal.addEventListener('click', () => {
+      const folderName = editFolderNameInput.value;
+      deleteFolderByName(folderName);
+    });
+  }
+
+  // --- 7. MODAL DE CONFIGURACIÓN VISUAL Y TEMA ---
 
   if (btnOpenThemeModal) {
     btnOpenThemeModal.addEventListener('click', () => {
@@ -639,6 +1131,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btnExportConfig.addEventListener('click', () => {
         const repoConfigData = {
           visualSettings: getVisualSettings(),
+          folders: getFolders(),
           materials: getMaterials(),
           password: localStorage.getItem('portal_password') || DEFAULT_PASSWORD,
           exportedAt: new Date().toISOString()
@@ -674,6 +1167,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.visualSettings) {
               localStorage.setItem('portal_visual_settings', JSON.stringify(data.visualSettings));
             }
+            if (data.folders && Array.isArray(data.folders)) {
+              localStorage.setItem('portal_folders_list', JSON.stringify(data.folders));
+            }
             if (data.materials && Array.isArray(data.materials)) {
               localStorage.setItem('portal_materials_list', JSON.stringify(data.materials));
             }
@@ -687,7 +1183,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             applyVisualSettings();
             renderMaterials();
-            alert('¡Configuración y materiales cargados con éxito en este navegador!');
+            alert('¡Configuración, carpetas y materiales cargados con éxito en este navegador!');
             closeTheme();
           } catch (err) {
             alert('Error al leer el archivo de respaldo. Asegúrate de seleccionar un archivo JSON válido.');

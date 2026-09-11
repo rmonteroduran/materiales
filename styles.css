@@ -892,6 +892,179 @@ button, input, select, textarea {
   background: rgba(255, 255, 255, 0.15);
 }
 
+/* Folder Breadcrumbs Navigation */
+.folder-breadcrumbs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  margin-bottom: 24px;
+  background: rgba(17, 24, 39, 0.65);
+  border: 1px solid var(--glass-border);
+  flex-wrap: wrap;
+  gap: 12px;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.breadcrumbs-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.btn-back-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-main);
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: var(--transition-fast);
+}
+
+.btn-back-breadcrumb:hover {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: #ffffff;
+  transform: translateX(-2px);
+}
+
+.breadcrumbs-path {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.breadcrumb-crumb {
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.breadcrumb-crumb:hover {
+  color: var(--text-main);
+  text-decoration: underline;
+}
+
+.breadcrumb-sep {
+  color: var(--text-muted);
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.breadcrumb-current {
+  color: #ffffff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.breadcrumbs-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.breadcrumbs-actions .btn-icon {
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+/* Folder Card Styles */
+.folder-card {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition-normal);
+  position: relative;
+  top: 0;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(17, 24, 39, 0.55);
+}
+
+.folder-card:hover {
+  top: -6px;
+  border-color: var(--accent-primary);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5), 0 0 24px var(--accent-glow);
+}
+
+.folder-card .card-banner {
+  height: 140px;
+}
+
+.folder-icon-large {
+  font-size: 26px;
+  color: #ffffff;
+  transition: var(--transition-fast);
+}
+
+.folder-card:hover .folder-icon-large {
+  transform: scale(1.15);
+}
+
+.folder-items-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-light);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  margin-top: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.folder-origin-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(99, 102, 241, 0.18);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  padding: 3px 9px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  width: fit-content;
+}
+
+.btn-card-folder-open {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-card-folder-open:hover {
+  filter: brightness(1.15);
+  transform: translateX(2px);
+}
+
 /* Footer */
 .app-footer {
   text-align: center;

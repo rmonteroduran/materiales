@@ -143,9 +143,34 @@
             </button>
           </div>
 
-          <button id="btnOpenAddModal" class="btn-primary" style="width: auto; padding: 10px 18px;">
-            <i class="fas fa-plus-circle"></i> Nuevo Material
-          </button>
+          <div class="tabs-actions" style="display: flex; gap: 10px; align-items: center;">
+            <button id="btnOpenAddFolderModal" class="btn-secondary" style="width: auto; padding: 10px 16px;">
+              <i class="fas fa-folder-plus"></i> Nueva Carpeta
+            </button>
+            <button id="btnOpenAddModal" class="btn-primary" style="width: auto; padding: 10px 18px;">
+              <i class="fas fa-plus-circle"></i> Nuevo Material
+            </button>
+          </div>
+        </div>
+
+        <!-- Folder Breadcrumbs Navigation -->
+        <div id="folderBreadcrumbs" class="folder-breadcrumbs glass-panel hidden">
+          <div class="breadcrumbs-left">
+            <button id="btnBackBreadcrumb" class="btn-back-breadcrumb" title="Volver al nivel superior">
+              <i class="fas fa-arrow-left"></i> <span>Volver</span>
+            </button>
+            <div class="breadcrumbs-path" id="breadcrumbsPath">
+              <!-- Generado dinámicamente -->
+            </div>
+          </div>
+          <div class="breadcrumbs-actions">
+            <button id="btnEditCurrentFolder" class="btn-icon" title="Editar esta carpeta">
+              <i class="fas fa-edit"></i> <span>Editar Carpeta</span>
+            </button>
+            <button id="btnDeleteCurrentFolder" class="btn-icon btn-outline-danger" title="Eliminar esta carpeta">
+              <i class="fas fa-trash-alt"></i> <span>Eliminar</span>
+            </button>
+          </div>
         </div>
 
         <!-- Materials Grid -->
@@ -240,6 +265,13 @@
           </div>
 
           <div class="form-group">
+            <label for="matFolderSelect">Carpeta / Subapartado</label>
+            <select id="matFolderSelect" class="form-input" style="padding-left: 14px;">
+              <option value="">(Nivel Raíz - Sin Carpeta)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
             <label for="matIconSelect">Icono Representativo</label>
             <select id="matIconSelect" class="form-input" style="padding-left: 14px;">
               <option value="fa-laptop-code">💻 Laptop / Código</option>
@@ -306,6 +338,13 @@
               <option value="workshops">Workshops</option>
               <option value="presentaciones">Presentaciones</option>
               <option value="proyectos">Proyectos</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="editMatFolderSelect">Carpeta / Subapartado</label>
+            <select id="editMatFolderSelect" class="form-input" style="padding-left: 14px;">
+              <option value="">(Nivel Raíz - Sin Carpeta)</option>
             </select>
           </div>
 
@@ -456,6 +495,117 @@
 
 
 
+
+  <!-- ==========================================================================
+       MODAL: CREAR NUEVA CARPETA
+       ========================================================================== -->
+  <div id="addFolderModal" class="modal-overlay hidden">
+    <div class="modal-content glass-panel">
+      <div class="modal-header">
+        <h3><i class="fas fa-folder-plus gradient-text"></i> Crear Nueva Carpeta</h3>
+        <button id="closeAddFolderModal" class="btn-close-modal"><i class="fas fa-times"></i></button>
+      </div>
+
+      <form id="addFolderForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="folderNameInput">Nombre de la Carpeta</label>
+            <input type="text" id="folderNameInput" class="form-input" placeholder="Ej: Entornos Virtualizados" required
+              style="padding-left: 14px;">
+          </div>
+
+          <div class="form-group">
+            <label for="folderCategorySelect">Apartado / Categoría</label>
+            <select id="folderCategorySelect" class="form-input" style="padding-left: 14px;">
+              <option value="workshops">Workshops</option>
+              <option value="presentaciones">Presentaciones</option>
+              <option value="proyectos">Proyectos</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="folderDescInput">Descripción (opcional)</label>
+            <textarea id="folderDescInput" class="form-input" rows="2" placeholder="Breve detalle del contenido de esta carpeta..."
+              style="padding-left: 14px; resize: vertical;"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="folderColorSelect">Color de la Carpeta</label>
+            <select id="folderColorSelect" class="form-input" style="padding-left: 14px;">
+              <option value="emerald">Verde Esmeralda (Entornos / Infraestructura)</option>
+              <option value="indigo">Azul / Índigo (WorkHQ / Talleres)</option>
+              <option value="amber">Ámbar / Naranja (Presentaciones / Diapositivas)</option>
+              <option value="rose">Rosa / Fucsia (Proyectos / Innovación)</option>
+              <option value="cyan">Cian / Aqua (Cloud / Virtualización)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="cancelAddFolderModal" class="btn-secondary">Cancelar</button>
+          <button type="submit" class="btn-primary" style="width: auto;"><i class="fas fa-folder-plus"></i> Crear Carpeta</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: EDITAR CARPETA
+       ========================================================================== -->
+  <div id="editFolderModal" class="modal-overlay hidden">
+    <div class="modal-content glass-panel">
+      <div class="modal-header">
+        <h3><i class="fas fa-edit gradient-text"></i> Editar Carpeta</h3>
+        <button id="closeEditFolderModal" class="btn-close-modal"><i class="fas fa-times"></i></button>
+      </div>
+
+      <form id="editFolderForm">
+        <input type="hidden" id="editFolderIdInput">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="editFolderNameInput">Nombre de la Carpeta</label>
+            <input type="text" id="editFolderNameInput" class="form-input" required style="padding-left: 14px;">
+          </div>
+
+          <div class="form-group">
+            <label for="editFolderCategorySelect">Apartado / Categoría</label>
+            <select id="editFolderCategorySelect" class="form-input" style="padding-left: 14px;">
+              <option value="workshops">Workshops</option>
+              <option value="presentaciones">Presentaciones</option>
+              <option value="proyectos">Proyectos</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="editFolderDescInput">Descripción</label>
+            <textarea id="editFolderDescInput" class="form-input" rows="2"
+              style="padding-left: 14px; resize: vertical;"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="editFolderColorSelect">Color de la Carpeta</label>
+            <select id="editFolderColorSelect" class="form-input" style="padding-left: 14px;">
+              <option value="emerald">Verde Esmeralda (Entornos / Infraestructura)</option>
+              <option value="indigo">Azul / Índigo (WorkHQ / Talleres)</option>
+              <option value="amber">Ámbar / Naranja (Presentaciones / Diapositivas)</option>
+              <option value="rose">Rosa / Fucsia (Proyectos / Innovación)</option>
+              <option value="cyan">Cian / Aqua (Cloud / Virtualización)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="justify-content: space-between;">
+          <button type="button" id="btnDeleteFolderModal" class="btn-danger">
+            <i class="fas fa-trash-alt"></i> Eliminar
+          </button>
+          <div style="display: flex; gap: 10px;">
+            <button type="button" id="cancelEditFolderModal" class="btn-secondary">Cancelar</button>
+            <button type="submit" class="btn-primary" style="width: auto;">Guardar Cambios</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- App Script -->
   <script src="app.js"></script>

@@ -1,9 +1,19 @@
 {
   "visualSettings": {
-    "theme": "emerald",
+    "theme": "slate",
     "title": "Rodrigo Montero Durán",
     "logoIcon": "fa-briefcase"
   },
+  "folders": [
+    {
+      "id": "folder-entornos-virtualizados",
+      "name": "Entornos Virtualizados",
+      "category": "presentaciones",
+      "description": "Clases, arquitecturas y material didáctico de Entornos Virtualizados.",
+      "icon": "fa-folder",
+      "bannerBg": "linear-gradient(135deg, #0f766e, #14b8a6)"
+    }
+  ],
   "materials": [
     {
       "id": "workhq-ssnc",
@@ -19,8 +29,42 @@
       ],
       "bannerBg": "linear-gradient(135deg, #0284c7, #6366f1)",
       "icon": "fa-graduation-cap"
+    },
+    {
+      "id": "clase-01-entornos-virtualizados",
+      "title": "Clase 01 - Introducción a Entornos Virtualizados",
+      "category": "presentaciones",
+      "folder": "Entornos Virtualizados",
+      "description": "Qué es la virtualización, conceptos clave, retos, hipervisores, infraestructura virtual, cloud computing y mapa de herramientas.",
+      "url": "./Presentaciones/Entornos Virtualizados/clase_01_introduccion_entornos_virtualizados_para_teams/clase_01_introduccion_entornos_virtualizados.html",
+      "tags": [
+        "Entornos Virtualizados",
+        "Virtualización",
+        "Hipervisores",
+        "Cloud",
+        "UTN"
+      ],
+      "bannerBg": "linear-gradient(135deg, #0f766e, #0284c7)",
+      "icon": "fa-file-powerpoint"
+    },
+    {
+      "id": "clase-02-arquitecturas-vm-contenedores",
+      "title": "Clase 02 - Arquitecturas de Virtualización, VM y Contenedores",
+      "category": "presentaciones",
+      "folder": "Entornos Virtualizados",
+      "description": "Arquitecturas de virtualización, componentes de una plataforma, máquinas virtuales, contenedores y criterios de decisión.",
+      "url": "./Presentaciones/Entornos Virtualizados/clase_02_arquitecturas_vm_contenedores_para_teams/clase_02_arquitecturas_vm_contenedores.html",
+      "tags": [
+        "Entornos Virtualizados",
+        "Arquitectura",
+        "VM",
+        "Contenedores",
+        "Docker"
+      ],
+      "bannerBg": "linear-gradient(135deg, #0f766e, #6366f1)",
+      "icon": "fa-file-powerpoint"
     }
   ],
   "password": "Materiales2026!",
-  "exportedAt": "2026-09-06T15:57:25.523Z"
+  "exportedAt": "2026-09-11T20:46:00.000Z"
 }
