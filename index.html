@@ -43,6 +43,21 @@
         <span>Mensaje de error</span>
       </div>
 
+      <!-- Inicio de Sesión con Google -->
+      <button type="button" id="btnGoogleLogin" class="btn-google-login">
+        <svg class="google-icon" viewBox="0 0 24 24" width="20" height="20">
+          <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+          <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+          <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+          <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+        </svg>
+        <span>Ingresar con Google</span>
+      </button>
+
+      <div class="auth-divider">
+        <span>o con contraseña</span>
+      </div>
+
       <form id="loginForm">
         <div class="form-group">
           <label for="emailInput">Correo Electrónico</label>
@@ -466,21 +481,30 @@
 
           <div class="form-group"
             style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--glass-border);">
-            <label>Respaldo & Sincronización entre Navegadores</label>
-            <div style="display: flex; gap: 10px; margin-top: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <label style="margin-bottom: 0;">Sincronización en la Nube (Firebase)</label>
+              <span id="cloudStatusBadge" style="font-size: 11px; padding: 3px 9px; border-radius: 12px; background: rgba(16, 185, 129, 0.15); color: #34d399; display: flex; align-items: center; gap: 5px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                <i class="fas fa-circle" style="font-size: 7px;"></i> Nube Conectada
+              </span>
+            </div>
+            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">
+              Los cambios de tema y diseño se sincronizan en vivo entre todos tus dispositivos conectados.
+            </p>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" id="btnSyncCloud" class="btn-primary"
+                style="font-size: 12px; padding: 8px 12px; width: auto;">
+                <i class="fas fa-cloud-upload-alt"></i> Subir Todo a la Nube
+              </button>
               <button type="button" id="btnExportConfig" class="btn-secondary"
                 style="font-size: 12px; padding: 8px 12px;">
-                <i class="fas fa-download"></i> Exportar Respaldo
+                <i class="fas fa-download"></i> Exportar JSON
               </button>
               <button type="button" id="btnImportConfig" class="btn-secondary"
                 style="font-size: 12px; padding: 8px 12px;">
-                <i class="fas fa-upload"></i> Cargar Respaldo
+                <i class="fas fa-upload"></i> Cargar JSON
               </button>
               <input type="file" id="importFileInput" accept=".json" style="display: none;">
             </div>
-            <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
-              Exporta tu respaldo en un archivo .json para usar tus mismos temas y materiales en cualquier dispositivo.
-            </p>
           </div>
         </div>
 
@@ -606,6 +630,11 @@
       </form>
     </div>
   </div>
+
+  <!-- Firebase SDK (Compat para compatibilidad directa con navegadores sin compilador) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- App Script -->
   <script src="app.js"></script>

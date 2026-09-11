@@ -3,6 +3,22 @@
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // --- CONFIGURACIÓN DE FIREBASE (CLOUD FIRESTORE) ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyBFuJMDGPKG-DFsS1hZHatVrRYR7cQmntc",
+    authDomain: "materiales-139c3.firebaseapp.com",
+    projectId: "materiales-139c3",
+    storageBucket: "materiales-139c3.firebasestorage.app",
+    messagingSenderId: "790835818171",
+    appId: "1:790835818171:web:eab087f7557d3bc3c0839e",
+    measurementId: "G-9943HYF6C6"
+  };
+
+  let firestoreDb = null;
+  let firebaseAuth = null;
+  let isCloudConnected = false;
+  let currentUserPhoto = localStorage.getItem('portal_logged_photo') || null;
+
   // Configuración y Usuarios Autorizados
   const ALLOWED_EMAILS = [
     'rodrigomontero89@gmail.com',
@@ -98,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const passwordInput = document.getElementById('passwordInput');
   const authAlert = document.getElementById('authAlert');
   const appAuthLogo = document.getElementById('appAuthLogo');
+  const btnGoogleLogin = document.getElementById('btnGoogleLogin');
 
   // Elementos DOM - Dashboard Nav & User & Branding
   const userEmailDisplay = document.getElementById('userEmailDisplay');
@@ -184,11 +201,128 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeLogoIconSelect = document.getElementById('themeLogoIconSelect');
   const themeCards = document.querySelectorAll('.theme-card');
 
+  // Elementos DOM - Nube Firebase
+  const cloudStatusBadge = document.getElementById('cloudStatusBadge');
+  const btnSyncCloud = document.getElementById('btnSyncCloud');
+
   let selectedThemeValue = 'emerald';
 
-  // --- 0. CONFIGURACIÓN VISUAL E ICONOS Y REPOSITORIO ---
+  // --- 0. CONFIGURACIÓN VISUAL, NUBE FIREBASE Y REPOSITORIO ---
+
+  function updateCloudBadge(connected, text) {
+    if (!cloudStatusBadge) return;
+    if (connected) {
+      cloudStatusBadge.style.background = 'rgba(16, 185, 129, 0.15)';
+      cloudStatusBadge.style.color = '#34d399';
+      cloudStatusBadge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+      cloudStatusBadge.innerHTML = `<i class="fas fa-circle" style="font-size: 7px;"></i> ${text || 'Nube Conectada'}`;
+    } else {
+      cloudStatusBadge.style.background = 'rgba(239, 68, 68, 0.15)';
+      cloudStatusBadge.style.color = '#f87171';
+      cloudStatusBadge.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+      cloudStatusBadge.innerHTML = `<i class="fas fa-exclamation-circle" style="font-size: 8px;"></i> ${text || 'Modo Local'}`;
+    }
+  }
+
+  function initFirebaseAndCloudSync() {
+    try {
+      if (window.firebase && typeof firebase.initializeApp === 'function') {
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
+        firestoreDb = firebase.firestore();
+        firebaseAuth = firebase.auth();
+        isCloudConnected = true;
+        updateCloudBadge(true, 'Nube Conectada (Firebase)');
+
+        // Escuchar estado de sesión de Firebase Auth (Google)
+        firebaseAuth.onAuthStateChanged((user) => {
+          if (user) {
+            const email = (user.email || '').toLowerCase();
+            if (ALLOWED_EMAILS.includes(email)) {
+              currentUser = email;
+              currentUserPhoto = user.photoURL || null;
+              localStorage.setItem('portal_logged_user', currentUser);
+              if (currentUserPhoto) {
+                localStorage.setItem('portal_logged_photo', currentUserPhoto);
+              }
+              showDashboard();
+            } else {
+              firebaseAuth.signOut().catch(e => console.warn(e));
+              showAuthAlert(`La cuenta de Google (${email}) no está en la lista de correos autorizados.`);
+            }
+          }
+        });
+
+        // Escucha en tiempo real (onSnapshot)
+        const configDocRef = firestoreDb.collection('portal').doc('config');
+        configDocRef.onSnapshot((docSnapshot) => {
+          if (docSnapshot.exists) {
+            const data = docSnapshot.data();
+            console.log('⚡ Sincronización en vivo recibida desde Firebase Firestore:', data);
+
+            // 1. Sincronizar Ajustes Visuales
+            if (data.visualSettings) {
+              localStorage.setItem('portal_visual_settings', JSON.stringify(data.visualSettings));
+              applyVisualSettings();
+
+              const currentVisual = getVisualSettings();
+              if (themeTitleInput) themeTitleInput.value = currentVisual.title || '';
+              if (themeLogoIconSelect) themeLogoIconSelect.value = currentVisual.logoIcon || 'fa-briefcase';
+              selectedThemeValue = currentVisual.theme || 'emerald';
+              themeCards.forEach(card => {
+                card.classList.toggle('active', card.dataset.themeValue === selectedThemeValue);
+              });
+            }
+
+            // 2. Sincronizar Carpetas si existen en la nube
+            if (data.folders && Array.isArray(data.folders)) {
+              localStorage.setItem('portal_folders_list', JSON.stringify(data.folders));
+            }
+
+            // 3. Sincronizar Materiales si existen en la nube
+            if (data.materials && Array.isArray(data.materials)) {
+              localStorage.setItem('portal_materials_list', JSON.stringify(data.materials));
+            }
+
+            // 4. Sincronizar Contraseña desde la base de datos en la nube
+            if (data.password) {
+              currentPassword = data.password;
+              localStorage.setItem('portal_password', data.password);
+            }
+
+            if (currentUser) {
+              renderMaterials();
+            }
+          } else {
+            // El documento aún no existe en Firebase: sembrar con configuración actual
+            console.log('Inicializando documento de configuración en Firebase Firestore...');
+            configDocRef.set({
+              password: currentPassword,
+              visualSettings: getVisualSettings(),
+              folders: getFolders(),
+              materials: getMaterials(),
+              updatedAt: new Date().toISOString()
+            }, { merge: true }).catch(err => {
+              console.warn('Nota: no se pudo sembrar Firestore:', err);
+            });
+          }
+        }, (error) => {
+          console.warn('Error en conexión con Firestore (verificar reglas de seguridad):', error);
+          updateCloudBadge(false, 'Error de Permisos');
+        });
+      } else {
+        updateCloudBadge(false, 'SDK No Cargado');
+      }
+    } catch (e) {
+      console.warn('Firebase no inicializado:', e);
+      updateCloudBadge(false, 'Modo Local');
+    }
+  }
 
   async function loadRepoConfig() {
+    // Iniciar conexión y sincronización en tiempo real con Firebase
+    initFirebaseAndCloudSync();
     try {
       const response = await fetch('./config.json', { cache: 'no-cache' });
       if (response.ok) {
@@ -209,10 +343,6 @@ document.addEventListener('DOMContentLoaded', () => {
           }
           if (repoData.materials) {
             localStorage.setItem('portal_materials_list', JSON.stringify(repoData.materials));
-          }
-          if (repoData.password) {
-            localStorage.setItem('portal_password', repoData.password);
-            currentPassword = repoData.password;
           }
           if (repoTime) {
             localStorage.setItem('portal_config_updated_at', repoTime);
@@ -349,8 +479,70 @@ document.addEventListener('DOMContentLoaded', () => {
     authScreen.classList.add('hidden');
     appDashboard.classList.remove('hidden');
     userEmailDisplay.textContent = currentUser;
-    userAvatar.textContent = currentUser.charAt(0).toUpperCase();
+    if (currentUserPhoto) {
+      userAvatar.innerHTML = `<img src="${currentUserPhoto}" alt="Avatar" referrerpolicy="no-referrer">`;
+    } else {
+      userAvatar.textContent = currentUser.charAt(0).toUpperCase();
+    }
     renderMaterials();
+  }
+
+  // Inicio de Sesión con Google
+  if (btnGoogleLogin) {
+    btnGoogleLogin.addEventListener('click', async () => {
+      authAlert.classList.add('hidden');
+
+      // Restricción de seguridad de OAuth / Google: requiere http o https
+      if (window.location.protocol === 'file:') {
+        showAuthAlert('Google Sign-In requiere un servidor web (http:// o https://). Cuando publiques tu web en GitHub Pages funcionará automáticamente. Para probarlo ahora en tu PC, haz doble clic en "iniciar_portal.bat" (o usa la contraseña de acceso).');
+        return;
+      }
+
+      if (!firebaseAuth) {
+        showAuthAlert('Servicio de autenticación no inicializado. Asegúrate de tener conexión a internet o ingresa con contraseña.');
+        return;
+      }
+
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+
+      try {
+        btnGoogleLogin.disabled = true;
+        btnGoogleLogin.style.opacity = '0.7';
+
+        const result = await firebaseAuth.signInWithPopup(provider);
+        const user = result.user;
+        const email = (user.email || '').toLowerCase();
+
+        if (!ALLOWED_EMAILS.includes(email)) {
+          await firebaseAuth.signOut();
+          showAuthAlert(`Acceso denegado: La cuenta (${email}) no está en la lista de correos autorizados.`);
+          return;
+        }
+
+        currentUser = email;
+        currentUserPhoto = user.photoURL || null;
+        localStorage.setItem('portal_logged_user', currentUser);
+        if (currentUserPhoto) {
+          localStorage.setItem('portal_logged_photo', currentUserPhoto);
+        }
+        showDashboard();
+      } catch (error) {
+        console.error('Error al autenticar con Google:', error);
+        if (error.code === 'auth/popup-closed-by-user') {
+          // Popup cerrado por el usuario voluntariamente
+        } else if (error.code === 'auth/operation-not-supported-in-this-environment') {
+          showAuthAlert('Google Sign-In requiere ejecutarse bajo protocolo http:// o https:// (como GitHub Pages o http://localhost:8000).');
+        } else if (error.code === 'auth/unauthorized-domain') {
+          showAuthAlert('Dominio no autorizado en Firebase. Agrega tu dominio en Firebase Console > Authentication > Settings > Authorized domains.');
+        } else {
+          showAuthAlert('Error al conectar con Google: ' + (error.message || error.code));
+        }
+      } finally {
+        btnGoogleLogin.disabled = false;
+        btnGoogleLogin.style.opacity = '1';
+      }
+    });
   }
 
   loginForm.addEventListener('submit', (e) => {
@@ -372,13 +564,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Login Exitoso
     currentUser = email;
+    currentUserPhoto = null;
+    localStorage.removeItem('portal_logged_photo');
     localStorage.setItem('portal_logged_user', currentUser);
     showDashboard();
   });
 
   btnLogout.addEventListener('click', () => {
+    if (firebaseAuth && firebaseAuth.currentUser) {
+      firebaseAuth.signOut().catch(e => console.warn(e));
+    }
     localStorage.removeItem('portal_logged_user');
+    localStorage.removeItem('portal_logged_photo');
     currentUser = null;
+    currentUserPhoto = null;
     emailInput.value = '';
     passwordInput.value = '';
     authAlert.classList.add('hidden');
@@ -791,8 +990,19 @@ document.addEventListener('DOMContentLoaded', () => {
     currentPassword = next;
     localStorage.setItem('portal_password', currentPassword);
     localStorage.setItem('portal_config_updated_at', new Date().toISOString());
+
+    // Guardar en la base de datos Firebase Firestore
+    if (firestoreDb) {
+      firestoreDb.collection('portal').doc('config').set({
+        password: next,
+        updatedAt: new Date().toISOString()
+      }, { merge: true })
+      .then(() => console.log('Contraseña actualizada en Firebase Firestore'))
+      .catch(err => console.error('Error guardando contraseña en Firebase:', err));
+    }
+
     closePassModal();
-    alert('¡Contraseña actualizada exitosamente!');
+    alert('¡Contraseña actualizada exitosamente en la base de datos!');
   });
 
   function showPassAlert(msg) {
@@ -1120,12 +1330,55 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('portal_config_updated_at', new Date().toISOString());
       applyVisualSettings();
       closeTheme();
+
+      // Guardar inmediatamente en Firebase Cloud Firestore (sincroniza en tiempo real a todos los dispositivos)
+      if (firestoreDb) {
+        firestoreDb.collection('portal').doc('config').set({
+          visualSettings: settings,
+          updatedAt: new Date().toISOString()
+        }, { merge: true })
+        .then(() => {
+          console.log('✅ Configuración visual guardada y sincronizada en Firebase Firestore');
+        })
+        .catch(err => {
+          console.error('Error al sincronizar con Firebase:', err);
+        });
+      }
     });
 
-    // --- Respaldo y Exportación / Importación ---
+    // --- Respaldo, Nube y Exportación / Importación ---
     const btnExportConfig = document.getElementById('btnExportConfig');
     const btnImportConfig = document.getElementById('btnImportConfig');
     const importFileInput = document.getElementById('importFileInput');
+
+    if (btnSyncCloud) {
+      btnSyncCloud.addEventListener('click', async () => {
+        if (!firestoreDb) {
+          alert('Firebase Firestore no está disponible en este momento. Revisa tu conexión a internet.');
+          return;
+        }
+
+        btnSyncCloud.disabled = true;
+        btnSyncCloud.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo...';
+
+        try {
+          await firestoreDb.collection('portal').doc('config').set({
+            visualSettings: getVisualSettings(),
+            folders: getFolders(),
+            materials: getMaterials(),
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+
+          alert('¡Sincronización en la nube completada! El diseño, las carpetas y los materiales están ahora guardados en Firebase y se verán idénticos en todos tus dispositivos.');
+        } catch (err) {
+          alert('Error al sincronizar con Firebase: ' + err.message + '\n\nTip: Verifica que las reglas de seguridad de Firestore estén en modo prueba o permitan lectura/escritura en /portal/{document=**}.');
+          console.error(err);
+        } finally {
+          btnSyncCloud.disabled = false;
+          btnSyncCloud.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Subir Todo a la Nube';
+        }
+      });
+    }
 
     if (btnExportConfig) {
       btnExportConfig.addEventListener('click', () => {
@@ -1133,7 +1386,6 @@ document.addEventListener('DOMContentLoaded', () => {
           visualSettings: getVisualSettings(),
           folders: getFolders(),
           materials: getMaterials(),
-          password: localStorage.getItem('portal_password') || DEFAULT_PASSWORD,
           exportedAt: new Date().toISOString()
         };
 
