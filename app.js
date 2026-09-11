@@ -460,12 +460,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- 1. GESTIÓN DE SESIÓN Y LOGIN ---
 
+  function checkAndHandleRedirect() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectUrl = urlParams.get('redirect') || sessionStorage.getItem('portal_redirect_url');
+      if (redirectUrl) {
+        sessionStorage.removeItem('portal_redirect_url');
+        window.location.replace(redirectUrl);
+        return true;
+      }
+    } catch (e) {
+      console.warn('Error en redirección automática:', e);
+    }
+    return false;
+  }
+
   async function checkSession() {
     applyVisualSettings();
     await loadRepoConfig();
     if (currentUser && ALLOWED_EMAILS.includes(currentUser.toLowerCase())) {
-      showDashboard();
+      if (!checkAndHandleRedirect()) {
+        showDashboard();
+      }
     } else {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('redirect') || sessionStorage.getItem('portal_redirect_url')) {
+        showAuthAlert('Debes iniciar sesión para acceder al material solicitado.');
+      }
       showLogin();
     }
   }
@@ -526,7 +547,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentUserPhoto) {
           localStorage.setItem('portal_logged_photo', currentUserPhoto);
         }
-        showDashboard();
+        if (!checkAndHandleRedirect()) {
+          showDashboard();
+        }
       } catch (error) {
         console.error('Error al autenticar con Google:', error);
         if (error.code === 'auth/popup-closed-by-user') {
@@ -534,7 +557,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (error.code === 'auth/operation-not-supported-in-this-environment') {
           showAuthAlert('Google Sign-In requiere ejecutarse bajo protocolo http:// o https:// (como GitHub Pages o http://localhost:8000).');
         } else if (error.code === 'auth/unauthorized-domain') {
-          showAuthAlert('Dominio no autorizado en Firebase. Agrega tu dominio en Firebase Console > Authentication > Settings > Authorized domains.');
+          const currentHost = window.location.hostname || 'tu dominio actual';
+          showAuthAlert(`Dominio no autorizado en Firebase ("${currentHost}"). Agrega "${currentHost}" en Firebase Console > Authentication > Settings > Authorized domains.`);
         } else {
           showAuthAlert('Error al conectar con Google: ' + (error.message || error.code));
         }
@@ -567,7 +591,9 @@ document.addEventListener('DOMContentLoaded', () => {
     currentUserPhoto = null;
     localStorage.removeItem('portal_logged_photo');
     localStorage.setItem('portal_logged_user', currentUser);
-    showDashboard();
+    if (!checkAndHandleRedirect()) {
+      showDashboard();
+    }
   });
 
   btnLogout.addEventListener('click', () => {
