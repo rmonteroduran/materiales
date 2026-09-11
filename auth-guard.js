@@ -8,6 +8,17 @@
     'rodrigomonteroduran@gmail.com'
   ];
 
+  function uncloak() {
+    const cloak = document.getElementById('auth-guard-cloak');
+    if (cloak) cloak.remove();
+  }
+
+  // Si se ejecuta en local mediante file:// (por ejemplo desde un zip descargado), permitir ejecución inmediata
+  if (window.location.protocol === 'file:') {
+    uncloak();
+    return;
+  }
+
   function getPortalUrl() {
     const currentPath = window.location.pathname;
     const idx = currentPath.search(/\/(Workshops|Presentaciones)\//i);
@@ -29,11 +40,6 @@
     return ALLOWED_EMAILS.includes(email);
   }
 
-  function uncloak() {
-    const cloak = document.getElementById('auth-guard-cloak');
-    if (cloak) cloak.remove();
-  }
-
   if (!checkAuth()) {
     // Guardar URL actual para redirigir automáticamente tras el login
     try {
@@ -53,7 +59,7 @@
     document.addEventListener('DOMContentLoaded', uncloak);
   }
 
-  // Agregar botón flotante "Volver al Portal"
+  // Barra flotante: únicamente acceso a "Volver al Portal"
   window.addEventListener('DOMContentLoaded', function() {
     uncloak();
 
@@ -65,7 +71,7 @@
     backBtn.href = portalUrl;
     backBtn.title = 'Volver al Portal de Materiales';
     backBtn.innerHTML = `
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M19 12H5M12 19l-7-7 7-7"/>
       </svg>
       <span>Portal</span>
@@ -102,6 +108,12 @@
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(15, 118, 110, 0.4);
         border-color: rgba(255, 255, 255, 0.3);
+      }
+      @media print {
+        #portal-back-btn,
+        #portal-action-widget {
+          display: none !important;
+        }
       }
     `;
     document.head.appendChild(style);

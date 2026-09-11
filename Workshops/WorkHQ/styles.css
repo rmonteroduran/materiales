@@ -2604,3 +2604,78 @@ body:fullscreen .slide {
   object-fit: contain;
   border-radius: 4px;
 }
+
+/* ==========================================================================
+   Print / PDF Export Styles
+   ========================================================================== */
+@media print {
+  @page {
+    size: landscape;
+    margin: 10mm;
+  }
+
+  header.top-bar,
+  footer,
+  .nav-controls,
+  .action-toolbar,
+  .progress-bar-container,
+  #portal-action-widget,
+  #portal-back-btn,
+  .modal-overlay,
+  .quick-overview-modal,
+  .toast,
+  .btn-icon,
+  .floating-controls,
+  .video-footer-actions button {
+    display: none !important;
+  }
+
+  body {
+    background: #0b0f19 !important;
+    color: #f8fafc !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .deck-container {
+    height: auto !important;
+    overflow: visible !important;
+    position: static !important;
+    display: block !important;
+  }
+
+  .slide {
+    position: static !important;
+    width: 100% !important;
+    min-height: 85vh !important;
+    height: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    padding: 20px 0 !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .slide-content {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  video {
+    display: block !important;
+    max-height: 400px !important;
+  }
+
+  .card, .benefit-card, .metric-card, .pillar-card {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}
